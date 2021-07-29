@@ -43,6 +43,11 @@ fn main() -> Result<(), Error> {
 
     let key_1 = &keyboard_layout["rows"]["e"]["key-1"];
     println!("Key-1: {:?}\n", key_1);
-    assert_eq!(key_1.as_str(), Some("test"));
+    assert_eq!(key_1.as_str(), Some("1"));
+
+    let e_keys = &keyboard_layout["rows"]["e"].as_table();
+    for (key, value) in e_keys.unwrap() {
+        println!("Key: {}, Value: {}", key, value);
+    }
     Ok(())
 }
