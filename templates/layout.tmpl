@@ -1,0 +1,58 @@
+default partial alphanumeric_keys modifier_keys
+{% set layout_name = "math" %}
+xkb_symbols "{{ layout_name }}" {
+
+    name[Group1]= "Math";
+
+    key <TLDE> {	[     grave,	asciitilde	]	};
+    key <AE01> {	[     {{ key_1 }},	exclam 		]	};
+    key <AE02> {	[     {{ key_2 }},	at		]	};
+    key <AE03> {	[     {{ key_3 }},	numbersign	]	};
+    key <AE04> {	[     {{ key_4 }},	dollar		]	};
+    key <AE05> {	[     {{ key_5 }},	percent		]	};
+    key <AE06> {	[     {{ key_6 }},	asciicircum	]	};
+    key <AE07> {	[     {{ key_7 }},	ampersand	]	};
+    key <AE08> {	[     {{ key_8 }},	asterisk	]	};
+    key <AE09> {	[     {{ key_9 }},	parenleft	]	};
+    key <AE10> {	[     {{ key_10 }},	parenright	]	};
+    key <AE11> {	[     {{ key_11 }},	underscore	]	};
+    key <AE12> {	[     {{ key_12 }},	plus		]	};
+
+    key <AD01> {	[     U0153,	Q 		]	};
+    key <AD02> {	[     U02D9,	W		]	};
+    key <AD03> {	[     acute,	E		]	};
+    key <AD04> {	[     U00AE,	R		]	};
+    key <AD05> {	[     U00DE,	T		]	};
+    key <AD06> {	[     U00A5,	Y		]	};
+    key <AD07> {	[ diaeresis,	U		]	};
+    key <AD08> {	[     i,	I		]	};
+    key <AD09> {	[     U00F8,	O		]	};
+    key <AD10> {	[     U2194,	P		]	};
+    key <AD11> {	[     U2329,	braceleft	]	};
+    key <AD12> {	[     U232A,	braceright	]	};
+
+    key <AC01> {	[    macron,	A 		]	};
+    key <AC02> {	[     U00DF,	S		]	};
+    key <AC03> {	[     U00F0,	D		]	};
+    key <AC04> {	[     U0192,	F		]	};
+    key <AC05> {	[         g,	G		]	};
+    key <AC06> {	[     U2190,	H		]	};
+    key <AC07> {	[     U2193,	J		]	};
+    key <AC08> {	[     U2191,	K		]	};
+    key <AC09> {	[     U2192,	L		]	};
+    key <AC10> {	[     U21C0,	colon		]	};
+    key <AC11> {	[ apostrophe,	quotedbl	]	};
+
+    key <AB01> {	[     U230A,	Z 		]	};
+    key <AB02> {	[     U230B,	X		]	};
+    key <AB03> {	[   cedilla,	C		]	};
+    key <AB04> {	[     caron,	V		]	};
+    key <AB05> {	[	  b,	B		]	};
+    key <AB06> {	[asciitilde,	N		]	};
+    key <AB07> {	[    ogonek,	M		]	};
+    key <AB08> {	[     U2264,	less		]	};
+    key <AB09> {	[     U2265,	greater		]	};
+    key <AB10> {	[     slash,	question	]	};
+
+    key <BKSL> {	[     U00AB,    bar	]	};
+};

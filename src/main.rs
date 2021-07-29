@@ -1,11 +1,40 @@
 use clap::{Arg, App};
-use toml::{Value, de::Error};
-
+use toml::{Value, value::Table};
+use tera::{Tera, Context};
 use std::fs;
+
+use failure::Error;
 
 fn read_file(filename: &str) -> String {
     return fs::read_to_string(filename)
         .expect("Unable to read keyboard layout file").to_owned();
+}
+
+fn create_layout(e_keys: &Option<&Table>) {
+    let tera = match Tera::new("templates/**/*.tmpl") {
+        Ok(t) => t,
+        Err(e) => {
+            println!("Parsing error(s): {}", e);
+            ::std::process::exit(1);
+        }
+    };
+
+    let mut context = Context::new();
+    context.insert("layout_name", "math");
+    println!("Using layout name: {}", "math");
+    for (key, value) in e_keys.unwrap() {
+        let key = str::replace(key, "-", "_");
+        println!("Key: {}, Value: {}", key, value);
+        context.insert(key, &value);
+    }
+
+    //match tera.render("keyboard/layout", &context) {
+    //let rendered = match tera.render("layout.tmpl", &context) {
+        //Err(e) => println!("{:?}", e),
+        //_ => ()
+    //};
+    let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
+    println!("\n{}", rendered);
 }
 
 fn main() -> Result<(), Error> {
@@ -46,8 +75,7 @@ fn main() -> Result<(), Error> {
     assert_eq!(key_1.as_str(), Some("1"));
 
     let e_keys = &keyboard_layout["rows"]["e"].as_table();
-    for (key, value) in e_keys.unwrap() {
-        println!("Key: {}, Value: {}", key, value);
-    }
+    create_layout(e_keys);
+    
     Ok(())
 }
