@@ -9,9 +9,9 @@
     key-7 = "7"
     key-8 = "8"
     key-9 = "9"
-    key-10 = "10"
-    key-11 = "11"
-    key-12 = "12"
+    key-10 = "0"
+    key-11 = "minus"
+    key-12 = "equal"
 
     [rows.d]
     key-1 = "q"
@@ -24,8 +24,8 @@
     key-8 = "i"
     key-9 = "o"
     key-10 = "p"
-    key-11 = "["
-    key-12 = "]"
+    key-11 = "bracketleft"
+    key-12 = "bracketright"
 
     [rows.c]
     key-1 = "a"
@@ -37,8 +37,8 @@
     key-7 = "j"
     key-8 = "k"
     key-9 = "l"
-    key-10 = ";"
-    key-11 = "'"
+    key-10 = "semicolon"
+    key-11 = "apostrophe"
 
     [rows.b]
     key-1 = "z"
@@ -48,9 +48,10 @@
     key-5 = "b"
     key-6 = "n"
     key-7 = "m"
-    key-8 = ","
-    key-9 = "."
-    key-10 = "/"
+    key-8 = "comma"
+    key-9 = "period"
+    key-10 = "slash"
 
     [rows.misc]
-    BKSL = "\\"
+    BKSL = "backslash"
+    TLDE = "grave"

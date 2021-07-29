@@ -1,16 +1,21 @@
 use clap::{Arg, App};
-use toml::{Value, value::Table};
+use toml::{Value};
 use tera::{Tera, Context};
 use std::fs;
 
 use failure::Error;
+use std::collections::HashMap;
 
 fn read_file(filename: &str) -> String {
     return fs::read_to_string(filename)
         .expect("Unable to read keyboard layout file").to_owned();
 }
 
-fn create_layout(e_keys: &Option<&Table>) {
+fn create_layout(keyboard_layout: Value, layout_name: String) -> String {
+    let rows = ["e", "d", "c", "b", "misc"];
+    let mut rows_table = HashMap::new();
+
+    for row in rows { rows_table.insert(row, keyboard_layout["rows"][&row].as_table()); };
     let tera = match Tera::new("templates/**/*.tmpl") {
         Ok(t) => t,
         Err(e) => {
@@ -20,21 +25,21 @@ fn create_layout(e_keys: &Option<&Table>) {
     };
 
     let mut context = Context::new();
-    context.insert("layout_name", "math");
-    println!("Using layout name: {}", "math");
-    for (key, value) in e_keys.unwrap() {
-        let key = str::replace(key, "-", "_");
-        println!("Key: {}, Value: {}", key, value);
-        context.insert(key, &value);
+    context.insert("layout_name", &layout_name);
+    println!("Using layout name: {}", &layout_name);
+
+    for (row, keys) in rows_table {
+        for (key, value) in keys.unwrap() {
+            let key = str::replace(key, "-", "_");
+            println!("Key: {}, Value: {}", key, value);
+            context.insert([row, key.as_str()].join("_"), &value);
+        }
     }
 
-    //match tera.render("keyboard/layout", &context) {
-    //let rendered = match tera.render("layout.tmpl", &context) {
-        //Err(e) => println!("{:?}", e),
-        //_ => ()
-    //};
+    println!("\n=== Linux Keyboard Layout ===\n");
     let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
     println!("\n{}", rendered);
+    return rendered;
 }
 
 fn main() -> Result<(), Error> {
@@ -74,8 +79,7 @@ fn main() -> Result<(), Error> {
     println!("Key-1: {:?}\n", key_1);
     assert_eq!(key_1.as_str(), Some("1"));
 
-    let e_keys = &keyboard_layout["rows"]["e"].as_table();
-    create_layout(e_keys);
+    let rendered_layout = create_layout(keyboard_layout, "math".to_string());
     
     Ok(())
 }
