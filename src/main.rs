@@ -1,14 +1,21 @@
 use clap::{Arg, App};
 use toml::{Value};
 use tera::{Tera, Context};
-use std::fs;
-
 use failure::Error;
+
+use std::fs;
+use std::fs::File;
+use std::io::Write;
 use std::collections::HashMap;
 
 fn read_file(filename: &str) -> String {
     return fs::read_to_string(filename)
         .expect("Unable to read keyboard layout file").to_owned();
+}
+
+fn write_file(keyboard_layout: String, filename: &str) {
+    let mut f = File::create(["layouts", filename].join("/")).expect("Unable to create file");
+    f.write_all(keyboard_layout.as_bytes()).expect("Unable to write data");
 }
 
 fn create_layout(keyboard_layout: Value, layout_name: String) -> String {
@@ -80,6 +87,7 @@ fn main() -> Result<(), Error> {
     assert_eq!(key_1.as_str(), Some("1"));
 
     let rendered_layout = create_layout(keyboard_layout, "math".to_string());
+    write_file(rendered_layout, "math");
     
     Ok(())
 }
