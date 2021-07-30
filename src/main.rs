@@ -69,11 +69,11 @@ fn main() -> Result<(), Error> {
             .index(1))
         .arg(Arg::with_name("name")
             .help("Specify the name of your keyboard layout")
-            .required(true)
+            .takes_value(true)
             .index(2))
         .arg(Arg::with_name("desc")
             .help("Give a brief description for keyboard layout name. Ex. English (US)")
-            .required(true)
+            .takes_value(true)
             .index(3));
 
     let mut borrow_app = app.clone();
@@ -89,11 +89,18 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    let filename = matches.value_of("keyboard_layout").unwrap();
-    let desc = matches.value_of("desc").unwrap();
-    println!("Using keyboard layout file: {} with description: {}", filename, desc);
+    let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
     let contents = read_file(filename);
-    let keyboard_layout: Value = toml::from_str(&contents)?;
+
+    let error_msg = format!("Error when parsing {}", filename);
+    let keyboard_layout: Value = toml::from_str(&contents).expect(&error_msg);
+
+    //println!("Using keyboard layout file: {} with description: {}", filename, desc);
+    let config = keyboard_layout["config"].clone();
+    let name = config.get("name").unwrap().as_str().unwrap();
+    let desc = config.get("desc").unwrap().as_str().unwrap();
+    let keyboard_name = matches.value_of("name").unwrap_or(name);
+    let keyboard_desc = matches.value_of("desc").unwrap_or(desc);
 
     if verbose {
         println!("=== Contents ===\n{}", contents);
@@ -102,12 +109,7 @@ fn main() -> Result<(), Error> {
         println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
     }
 
-    // Specify keyboard names and description as args or in key.layout.toml file
-    //let keyboard_name = matches.value_of("keyboard_layout").unwrap()
-        //.split(".").next().expect("Keyboard file name layout is improperly formatted");
-    //let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), desc.to_string(), verbose);
-    let keyboard_name = matches.value_of("name").unwrap();
-    let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), desc.to_string(), verbose);
+    let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), keyboard_desc.to_string(), verbose);
     write_file(rendered_layout, "math");
     
     Ok(())
