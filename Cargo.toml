@@ -10,3 +10,12 @@ clap = "2.33.3"
 toml = "0.5.8"
 tera = "1"
 failure = "0.1.8"
+
+[lib]
+name = "utils"
+path = "src/utils/mod.rs"
+
+# Unit Tests
+[[bin]]
+name = "tests-utils"
+path = "tests/utils/tests.rs"
