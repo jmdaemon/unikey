@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use utils::files::{read_file, write_file};
 
-fn create_layout(keyboard_layout: Value, layout_name: String, verbose: bool) -> String {
+fn create_layout(keyboard_layout: Value, layout_name: String, layout_desc: String, verbose: bool) -> String {
     let rows = ["e", "d", "c", "b", "misc"];
     let mut rows_table = HashMap::new();
 
@@ -22,6 +22,7 @@ fn create_layout(keyboard_layout: Value, layout_name: String, verbose: bool) -> 
 
     let mut context = Context::new();
     context.insert("layout_name", &layout_name);
+    context.insert("layout_desc", &layout_desc);
     if verbose {
         println!("Using layout name: {}", &layout_name);
         for (row, keys) in rows_table {
@@ -63,9 +64,17 @@ fn main() -> Result<(), Error> {
             .multiple(true)
             .help("Show verbose output"))
         .arg(Arg::with_name("keyboard_layout")
-            .help("Specify [keyboard_name].layout.toml file read from")
+            .help("Specify the file path to the keyboard layout config")
             .required(true)
-            .index(1));
+            .index(1))
+        .arg(Arg::with_name("name")
+            .help("Specify the name of your keyboard layout")
+            .required(true)
+            .index(2))
+        .arg(Arg::with_name("desc")
+            .help("Give a brief description for keyboard layout name. Ex. English (US)")
+            .required(true)
+            .index(3));
 
     let mut borrow_app = app.clone();
     let matches = app.get_matches();
@@ -81,7 +90,8 @@ fn main() -> Result<(), Error> {
     }
 
     let filename = matches.value_of("keyboard_layout").unwrap();
-    println!("Using keyboard layout file: {}", filename);
+    let desc = matches.value_of("desc").unwrap();
+    println!("Using keyboard layout file: {} with description: {}", filename, desc);
     let contents = read_file(filename);
     let keyboard_layout: Value = toml::from_str(&contents)?;
 
@@ -92,13 +102,12 @@ fn main() -> Result<(), Error> {
         println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
     }
 
-    let key_1 = &keyboard_layout["rows"]["e"]["key-1"];
-    println!("Key-1: {:?}\n", key_1);
-    assert_eq!(key_1.as_str(), Some("1"));
-
-    let keyboard_name = matches.value_of("keyboard_layout").unwrap()
-        .split(".").next().expect("Keyboard file name layout is improperly formatted");
-    let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), verbose);
+    // Specify keyboard names and description as args or in key.layout.toml file
+    //let keyboard_name = matches.value_of("keyboard_layout").unwrap()
+        //.split(".").next().expect("Keyboard file name layout is improperly formatted");
+    //let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), desc.to_string(), verbose);
+    let keyboard_name = matches.value_of("name").unwrap();
+    let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), desc.to_string(), verbose);
     write_file(rendered_layout, "math");
     
     Ok(())

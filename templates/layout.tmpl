@@ -1,8 +1,7 @@
 default partial alphanumeric_keys modifier_keys
-{% set layout_name = "math" %}
 xkb_symbols "{{ layout_name }}" {
 
-    name[Group1]= "Math";
+    name[Group1]= "{{ layout_desc }}";
 
     key <TLDE> {	[     grave,	asciitilde	]	};
     key <AE01> {	[     {{ e_key_1 }},	exclam 		]	};
