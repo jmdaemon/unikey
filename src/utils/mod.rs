@@ -69,7 +69,7 @@ pub mod layout {
         return rendered;
     }
 
-    pub fn create_definition(layout_name: String, layout_desc: String) -> String {
+    pub fn create_evdev(layout_name: String, layout_desc: String) -> String {
         let tera = match Tera::new("templates/**/*.tmpl") {
             Ok(t) => t,
             Err(e) => {
@@ -83,6 +83,24 @@ pub mod layout {
 
         println!("=== Linux Keyboard Definition ===");
         let rendered = tera.render("evdev.xml.tmpl", &context).expect("Template failed to render");
+        println!("{}", rendered);
+        return rendered;
+    }
+
+    pub fn create_base_lst(layout_name: String, layout_desc: String) -> String {
+        let tera = match Tera::new("templates/**/*.tmpl") {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("Parsing error(s): {}", e);
+                exit(1);
+            }
+        };
+        let mut context = Context::new();
+        context.insert("layout_name", &layout_name);
+        context.insert("layout_desc", &layout_desc);
+
+        println!("=== base.lst ===");
+        let rendered = tera.render("base.lst.tmpl", &context).expect("Template failed to render");
         println!("{}", rendered);
         return rendered;
     }
