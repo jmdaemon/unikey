@@ -87,7 +87,7 @@ pub mod layout {
         return rendered;
     }
 
-    pub fn create_base_lst(layout_name: String, layout_desc: String) -> String {
+    pub fn create_lst(layout_name: String, layout_desc: String, lst_name: &str) -> String {
         let tera = match Tera::new("templates/**/*.tmpl") {
             Ok(t) => t,
             Err(e) => {
@@ -99,8 +99,8 @@ pub mod layout {
         context.insert("layout_name", &layout_name);
         context.insert("layout_desc", &layout_desc);
 
-        println!("=== base.lst ===");
-        let rendered = tera.render("base.lst.tmpl", &context).expect("Template failed to render");
+        println!("=== {} ===", lst_name);
+        let rendered = tera.render(&[lst_name,".tmpl"].join(""), &context).expect("Template failed to render");
         println!("{}", rendered);
         return rendered;
     }

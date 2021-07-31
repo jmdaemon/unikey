@@ -2,7 +2,7 @@ use clap::{Arg, App, AppSettings};
 use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
-use utils::layout::{create_layout, create_evdev, create_base_lst};
+use utils::layout::{create_layout, create_evdev, create_lst};
 
 fn main() -> Result<(), Error> {
     let app =
@@ -68,10 +68,12 @@ fn main() -> Result<(), Error> {
 
     let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), keyboard_desc.to_string(), verbose);
     let evdev = create_evdev(keyboard_name.to_string(), keyboard_desc.to_string());
-    let base_lst = create_base_lst(keyboard_name.to_string(), keyboard_desc.to_string());
+    let base_lst = create_lst(keyboard_name.to_string(), keyboard_desc.to_string(), "base.lst");
+    let evdev_lst = create_lst(keyboard_name.to_string(), keyboard_desc.to_string(), "evdev.lst");
     write_file(rendered_layout, "math");
     write_file(evdev, "evdev.xml");
     write_file(base_lst, "base.lst");
+    write_file(evdev_lst, "evdev.lst");
     
     Ok(())
 }
