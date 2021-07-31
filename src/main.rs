@@ -1,25 +1,14 @@
 use clap::{Arg, App, AppSettings};
-use toml::{Value};
+use toml::{Value, value::Table};
 use tera::{Tera, Context};
 use failure::Error;
 
 use std::collections::HashMap;
+use std::process::exit;
 
 use utils::files::{read_file, write_file};
 
-fn create_layout(keyboard_layout: Value, layout_name: String, layout_desc: String, verbose: bool) -> String {
-    let rows = ["e", "d", "c", "b", "misc"];
-    let mut rows_table = HashMap::new();
-
-    for row in rows { rows_table.insert(row, keyboard_layout["rows"][&row].as_table()); };
-    let tera = match Tera::new("templates/**/*.tmpl") {
-        Ok(t) => t,
-        Err(e) => {
-            println!("Parsing error(s): {}", e);
-            ::std::process::exit(1);
-        }
-    };
-
+fn init_context(rows_table: HashMap<&str, Option<&Table>>, layout_name: String, layout_desc: String, verbose: bool) -> tera::Context {
     let mut context = Context::new();
     context.insert("layout_name", &layout_name);
     context.insert("layout_desc", &layout_desc);
@@ -42,10 +31,27 @@ fn create_layout(keyboard_layout: Value, layout_name: String, layout_desc: Strin
             }
         }
     }
+    println!("");
+    return context;
+}
 
-    println!("\n=== Linux Keyboard Layout ===\n");
+fn create_layout(keyboard_layout: Value, layout_name: String, layout_desc: String, verbose: bool) -> String {
+    let rows = ["e", "d", "c", "b", "misc"];
+    let mut rows_table = HashMap::new();
+
+    for row in rows { rows_table.insert(row, keyboard_layout["rows"][&row].as_table()); };
+    let tera = match Tera::new("templates/**/*.tmpl") {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Parsing error(s): {}", e);
+            exit(1);
+        }
+    };
+
+    let context = init_context(rows_table, layout_name, layout_desc, verbose);
+    println!("=== Linux Keyboard Layout ===");
     let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
-    println!("\n{}", rendered);
+    println!("{}", rendered);
     return rendered;
 }
 
@@ -91,16 +97,18 @@ fn main() -> Result<(), Error> {
 
     let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
     let contents = read_file(filename);
-
-    let error_msg = format!("Error when parsing {}", filename);
-    let keyboard_layout: Value = toml::from_str(&contents).expect(&error_msg);
-
-    //println!("Using keyboard layout file: {} with description: {}", filename, desc);
+    let keyboard_layout: Value = toml::from_str(&contents)?;
     let config = keyboard_layout["config"].clone();
-    let name = config.get("name").unwrap().as_str().unwrap();
-    let desc = config.get("desc").unwrap().as_str().unwrap();
+
+    let name = config.get("name").unwrap().as_str().unwrap_or("us");
+    let desc = config.get("desc").unwrap().as_str().unwrap_or("English (US)");
     let keyboard_name = matches.value_of("name").unwrap_or(name);
     let keyboard_desc = matches.value_of("desc").unwrap_or(desc);
+
+    println!("================================");
+    println!("Keyboard Layout File  : {}", filename);
+    println!("Keyboard Name         : {}", keyboard_name);
+    println!("Keyboard Description  : {}", keyboard_desc);
 
     if verbose {
         println!("=== Contents ===\n{}", contents);
