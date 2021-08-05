@@ -8,7 +8,7 @@ pub mod files {
             .expect("Unable to read keyboard layout file").to_owned();
     }
 
-    pub fn write_file(keyboard_layout: String, filename: &str) {
+    pub fn write_file(keyboard_layout: &str, filename: &str) {
         let mut f = File::create(["layouts", filename].join("/")).expect("Unable to create file");
         f.write_all(keyboard_layout.as_bytes()).expect("Unable to write data");
     }
@@ -25,6 +25,12 @@ pub mod layout {
     pub struct Layout {
         pub name: String,
         pub desc: String
+    }
+
+    impl Layout {
+        pub fn new<S: Into<String>>(name: S, desc: S) ->Layout {
+            Layout { name: name.into(), desc: desc.into() }
+        }
     }
 
     fn init_tera() -> Tera {

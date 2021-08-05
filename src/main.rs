@@ -66,15 +66,15 @@ fn main() -> Result<(), Error> {
         println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
     }
 
-    let layout: Layout = Layout { name: keyboard_name.to_string(), desc: keyboard_desc.to_string()};
+    let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
     let rendered_layout = create_layout(keyboard_layout, &layout, verbose);
     let evdev = create_evdev(&layout);
     let base_lst = create_lst(&layout, "base.lst");
     let evdev_lst = create_lst(&layout, "evdev.lst");
-    write_file(rendered_layout, "math");
-    write_file(evdev, "evdev.xml");
-    write_file(base_lst, "base.lst");
-    write_file(evdev_lst, "evdev.lst");
+    write_file(&rendered_layout, keyboard_name);
+    write_file(&evdev, "evdev.xml");
+    write_file(&base_lst, "base.lst");
+    write_file(&evdev_lst, "evdev.lst");
     
     Ok(())
 }
