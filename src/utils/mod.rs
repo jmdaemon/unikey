@@ -22,6 +22,11 @@ pub mod layout {
     use std::collections::HashMap;
     use std::process::exit;
 
+    pub struct Layout {
+        pub name: String,
+        pub desc: String
+    }
+
     fn init_tera() -> Tera {
         let tera = match Tera::new("templates/**/*.tmpl") {
             Ok(t) => t,
@@ -33,13 +38,12 @@ pub mod layout {
         return tera;
     }
 
-
-    fn init_context(rows_table: HashMap<&str, Option<&Table>>, layout_name: String, layout_desc: String, verbose: bool) -> tera::Context {
+    fn init_context(rows_table: HashMap<&str, Option<&Table>>, layout: &Layout, verbose: bool) -> tera::Context {
         let mut context = Context::new();
-        context.insert("layout_name", &layout_name);
-        context.insert("layout_desc", &layout_desc);
+        context.insert("layout_name", &layout.name);
+        context.insert("layout_desc", &layout.desc);
         if verbose {
-            println!("Using layout name: {}", &layout_name);
+            println!("Using layout name: {}", &layout.name);
             for (row, keys) in rows_table {
                 println!("\nRow: {}", row);
                 for (key, value) in keys.unwrap() {
@@ -61,11 +65,12 @@ pub mod layout {
         return context;
     }
 
-    fn create_def(layout_name: String, layout_desc: String, msg: &str, output: &str) -> String {
+    //fn create_def(layout_name: String, layout_desc: String, msg: &str, output: &str) -> String {
+    fn create_def(layout: &Layout, msg: &str, output: &str) -> String {
         let tera = init_tera();
         let mut context = Context::new();
-        context.insert("layout_name", &layout_name);
-        context.insert("layout_desc", &layout_desc);
+        context.insert("layout_name", &layout.name);
+        context.insert("layout_desc", &layout.desc);
 
         println!("=== {} ===", msg);
         let rendered = tera.render(output, &context).expect("Template failed to render");
@@ -73,25 +78,25 @@ pub mod layout {
         return rendered;
     }
 
-    pub fn create_layout(keyboard_layout: Value, layout_name: String, layout_desc: String, verbose: bool) -> String {
+    pub fn create_layout(keyboard_layout: Value, layout: &Layout, verbose: bool) -> String {
         let rows = ["e", "d", "c", "b", "misc"];
         let mut rows_table = HashMap::new();
 
         for row in rows { rows_table.insert(row, keyboard_layout["rows"][&row].as_table()); };
         let tera = init_tera();
 
-        let context = init_context(rows_table, layout_name, layout_desc, verbose);
+        let context = init_context(rows_table, layout, verbose);
         println!("=== Linux Keyboard Layout ===");
         let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
         println!("{}", rendered);
         return rendered;
     }
 
-    pub fn create_evdev(layout_name: String, layout_desc: String) -> String {
-        return create_def(layout_name, layout_desc, "Linux Keyboard Definition", "evdev.xml.tmpl");
+    pub fn create_evdev(layout: &Layout) -> String {
+        return create_def(layout, "Linux Keyboard Definition", "evdev.xml.tmpl");
     }
 
-    pub fn create_lst(layout_name: String, layout_desc: String, lst_name: &str) -> String {
-        return create_def(layout_name, layout_desc, lst_name, &[lst_name,".tmpl"].join(""));
+    pub fn create_lst(layout: &Layout, lst_name: &str) -> String {
+        return create_def(layout, lst_name, &[lst_name,".tmpl"].join(""));
     }
 }

@@ -2,7 +2,7 @@ use clap::{Arg, App, AppSettings};
 use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
-use utils::layout::{create_layout, create_evdev, create_lst};
+use utils::layout::{Layout, create_layout, create_evdev, create_lst};
 
 fn main() -> Result<(), Error> {
     let app =
@@ -66,10 +66,11 @@ fn main() -> Result<(), Error> {
         println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
     }
 
-    let rendered_layout = create_layout(keyboard_layout, keyboard_name.to_string(), keyboard_desc.to_string(), verbose);
-    let evdev = create_evdev(keyboard_name.to_string(), keyboard_desc.to_string());
-    let base_lst = create_lst(keyboard_name.to_string(), keyboard_desc.to_string(), "base.lst");
-    let evdev_lst = create_lst(keyboard_name.to_string(), keyboard_desc.to_string(), "evdev.lst");
+    let layout: Layout = Layout { name: keyboard_name.to_string(), desc: keyboard_desc.to_string()};
+    let rendered_layout = create_layout(keyboard_layout, &layout, verbose);
+    let evdev = create_evdev(&layout);
+    let base_lst = create_lst(&layout, "base.lst");
+    let evdev_lst = create_lst(&layout, "evdev.lst");
     write_file(rendered_layout, "math");
     write_file(evdev, "evdev.xml");
     write_file(base_lst, "base.lst");
