@@ -71,20 +71,7 @@ pub mod layout {
         return context;
     }
 
-    //fn create_def(layout_name: String, layout_desc: String, msg: &str, output: &str) -> String {
-    fn create_def(layout: &Layout, msg: &str, output: &str) -> String {
-        let tera = init_tera();
-        let mut context = Context::new();
-        context.insert("layout_name", &layout.name);
-        context.insert("layout_desc", &layout.desc);
-
-        println!("=== {} ===", msg);
-        let rendered = tera.render(output, &context).expect("Template failed to render");
-        println!("{}", rendered);
-        return rendered;
-    }
-
-    pub fn create_layout(keyboard_layout: Value, layout: &Layout, verbose: bool) -> String {
+    pub fn create_layout(keyboard_layout: &Value, layout: &Layout, verbose: bool) -> String {
         let rows = ["e", "d", "c", "b", "misc"];
         let mut rows_table = HashMap::new();
 
@@ -94,6 +81,18 @@ pub mod layout {
         let context = init_context(rows_table, layout, verbose);
         println!("=== Linux Keyboard Layout ===");
         let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
+        println!("{}", rendered);
+        return rendered;
+    }
+
+    fn create_def(layout: &Layout, msg: &str, output: &str) -> String {
+        let tera = init_tera();
+        let mut context = Context::new();
+        context.insert("layout_name", &layout.name);
+        context.insert("layout_desc", &layout.desc);
+
+        println!("=== {} ===", msg);
+        let rendered = tera.render(output, &context).expect("Template failed to render");
         println!("{}", rendered);
         return rendered;
     }

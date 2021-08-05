@@ -47,7 +47,7 @@ fn main() -> Result<(), Error> {
     let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
     let contents = read_file(filename);
     let keyboard_layout: Value = toml::from_str(&contents)?;
-    let config = keyboard_layout["config"].clone();
+    let config = &keyboard_layout["config"];
 
     let name = config.get("name").unwrap().as_str().unwrap_or("us");
     let desc = config.get("desc").unwrap().as_str().unwrap_or("English (US)");
@@ -67,7 +67,7 @@ fn main() -> Result<(), Error> {
     }
 
     let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
-    let rendered_layout = create_layout(keyboard_layout, &layout, verbose);
+    let rendered_layout = create_layout(&keyboard_layout, &layout, verbose);
     let evdev = create_evdev(&layout);
     let base_lst = create_lst(&layout, "base.lst");
     let evdev_lst = create_lst(&layout, "evdev.lst");
