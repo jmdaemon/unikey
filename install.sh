@@ -1,36 +1,45 @@
 #!/bin/bash
 
+show_usage() {
+    echo "Usage:    ./install.sh [path-to-layout] [layout-name]"
+}
+
 src="$1"
+layout_name="$2"
 dest=/usr/share/X11/xkb/symbols
-sudo cp $src $dest
 
-# LST
-baselst=$(cat layouts/base.lst)
-sed "/\! layout/a   ${layout}" test/base.lst
+if [[ -z $src || -z layout_name ]]; then
+    show_usage
+else
+    sudo cp "$src/$layout_name" $dest
 
-evdev=$(cat layouts/evdev.lst)
-sed "/\! layout/a   ${layout}" test/evdev.lst
+    # LST
+    baselst=$(cat layouts/base.lst)
+    sudo sed "/\! layout/a   ${layout}" $src/base.lst
 
-# XML
+    evdev=$(cat layouts/evdev.lst)
+    sudo sed "/\! layout/a   ${layout}" $src/evdev.lst
 
-escaped=$(cat layouts/evdev.xml |
-    sed 's;<;\\<;g' |
-    sed 's;>;\\>;g' |
-    sed 's;/;\\/;g' |
-    sed 's/!/\\!/g' | tr -d '\n'; printf "\n")
+    # XML
+    escaped=$(cat layouts/evdev.xml |
+        sed 's;<;\\<;g' |
+        sed 's;>;\\>;g' |
+        sed 's;/;\\/;g' |
+        sed 's/!/\\!/g' | tr -d '\n'; printf "\n")
 
-regexp="<layout>"
-line=$(grep -n "$regexp" test/evdev.xml | cut -d ":" -f 1)
-result=$(echo $line | cut -d " " -f 1)
+    regexp="<layout>"
+    line=$(grep -n "$regexp" $src/evdev.xml | cut -d ":" -f 1)
+    result=$(echo $line | cut -d " " -f 1)
 
-# Evdev
-sed -i "${result} i $escaped" test/evdev.xml
-xmllint --format test/evdev.xml > temp
-cat temp > test/evdev.xml
-rm temp
+    # Evdev
+    sudo sed -i "${result} i $escaped" $src/evdev.xml
+    xmllint --format $src/evdev.xml > temp
+    sudo cat temp > $src/evdev.xml
+    rm temp
 
-# Base
-sed -i "${result} i $escaped" test/base.xml
-xmllint --format test/base.xml > temp
-cat temp > test/base.xml
-rm temp
+    # Base
+    sudo sed -i "${result} i $escaped" $src/base.xml
+    xmllint --format $src/base.xml > temp
+    sudo cat temp > $src/base.xml
+    rm temp
+fi
