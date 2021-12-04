@@ -1,0 +1,61 @@
+[config]
+name = "us"
+desc = "English (US)"
+
+[rows]
+    [rows.e]
+    key-1 = "1"
+    key-2 = "2"
+    key-3 = "3"
+    key-4 = "4"
+    key-5 = "5"
+    key-6 = "6"
+    key-7 = "7"
+    key-8 = "8"
+    key-9 = "9"
+    key-10 = "0"
+    key-11 = "minus"
+    key-12 = "equal"
+
+    [rows.d]
+    key-1 = "q"
+    key-2 = "w"
+    key-3 = "e"
+    key-4 = "r"
+    key-5 = "t"
+    key-6 = "y"
+    key-7 = "u"
+    key-8 = "i"
+    key-9 = "o"
+    key-10 = "p"
+    key-11 = "bracketleft"
+    key-12 = "bracketright"
+
+    [rows.c]
+    key-1 = "a"
+    key-2 = "s"
+    key-3 = "d"
+    key-4 = "f"
+    key-5 = "g"
+    key-6 = "h"
+    key-7 = "j"
+    key-8 = "k"
+    key-9 = "l"
+    key-10 = "semicolon"
+    key-11 = "apostrophe"
+
+    [rows.b]
+    key-1 = "z"
+    key-2 = "x"
+    key-3 = "c"
+    key-4 = "v"
+    key-5 = "b"
+    key-6 = "n"
+    key-7 = "m"
+    key-8 = "comma"
+    key-9 = "period"
+    key-10 = "slash"
+
+    [rows.misc]
+    BKSL = "backslash"
+    TLDE = "grave"

@@ -1,0 +1,21 @@
+[package]
+name = "unikey"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.33.3"
+toml = "0.5.8"
+tera = "1"
+failure = "0.1.8"
+
+[lib]
+name = "utils"
+path = "src/utils/mod.rs"
+
+# Unit Tests
+[[bin]]
+name = "tests-utils"
+path = "tests/utils/tests.rs"
