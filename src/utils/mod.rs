@@ -1,13 +1,20 @@
 pub mod files {
+    /**
+    * Utilities for reading and writing to files
+    */
     use std::fs;
     use std::fs::File;
     use std::io::Write;
 
+    /// Reads an entire file into a string
     pub fn read_file(filename: &str) -> String {
         return fs::read_to_string(filename)
             .expect("Unable to read keyboard layout file").to_owned();
     }
 
+    /// Writes a keyboard layout to disk
+    /// This creates the layouts directory.
+    /// Note that this directory will be customizable in the future.
     pub fn write_file(keyboard_layout: &str, filename: &str) {
         let mut f = File::create(["layouts", filename].join("/")).expect("Unable to create file");
         f.write_all(keyboard_layout.as_bytes()).expect("Unable to write data");
@@ -17,6 +24,9 @@ pub mod files {
 
 
 pub mod layout {
+    /**
+    * Manage Linux XKB layouts
+    */
     use toml::{Value, value::Table};
     use tera::{Tera, Context};
     use std::collections::HashMap;
@@ -33,6 +43,7 @@ pub mod layout {
         }
     }
 
+    /// Creates a Tera instance with all the templates found in templates
     fn init_tera() -> Tera {
         let tera = match Tera::new("templates/**/*.tmpl") {
             Ok(t) => t,
@@ -44,6 +55,7 @@ pub mod layout {
         return tera;
     }
 
+    /// Renders the template with the given variables
     fn init_context(rows_table: HashMap<&str, Option<&Table>>, layout: &Layout, verbose: bool) -> tera::Context {
         let mut context = Context::new();
         context.insert("layout_name", &layout.name);
@@ -85,7 +97,10 @@ pub mod layout {
         return rendered;
     }
 
+    /// Renders the keyboard layout into the template
     fn create_def(layout: &Layout, msg: &str, output: &str) -> String {
+        // Note that this is created multiple times, this should only
+        // be created statically once.
         let tera = init_tera();
         let mut context = Context::new();
         context.insert("layout_name", &layout.name);
@@ -97,10 +112,12 @@ pub mod layout {
         return rendered;
     }
 
+    /// Returns the rendered evdev.xml, base.xml files
     pub fn create_evdev(layout: &Layout) -> String {
         return create_def(layout, "Linux Keyboard Definition", "evdev.xml.tmpl");
     }
 
+    /// Returns the rendered evdev.lst, base.lst files
     pub fn create_lst(layout: &Layout, lst_name: &str) -> String {
         return create_def(layout, lst_name, &[lst_name,".tmpl"].join(""));
     }

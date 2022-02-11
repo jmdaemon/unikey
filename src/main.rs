@@ -5,6 +5,7 @@ use utils::files::{read_file, write_file};
 use utils::layout::{Layout, create_layout, create_evdev, create_lst};
 
 fn main() -> Result<(), Error> {
+    // Create Unikey CLI
     let app = App::new("Unikey")
         .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
@@ -17,6 +18,7 @@ fn main() -> Result<(), Error> {
         .arg(Arg::new("desc")
             .help("Give a brief description for keyboard layout name. Ex. English (US)"));
 
+    // Print help message if user inputs -vv
     let mut borrow_app = app.clone();
     let matches = app.get_matches();
     let verbose;
@@ -30,16 +32,19 @@ fn main() -> Result<(), Error> {
         }
     }
 
+    // Parse arguments
     let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
     let contents = read_file(filename);
     let keyboard_layout: Value = toml::from_str(&contents)?;
     let config = &keyboard_layout["config"];
 
+    // Parse keyboard config
     let name = config.get("name").unwrap().as_str().unwrap_or("us");
     let desc = config.get("desc").unwrap().as_str().unwrap_or("English (US)");
     let keyboard_name = matches.value_of("name").unwrap_or(name);
     let keyboard_desc = matches.value_of("desc").unwrap_or(desc);
 
+    // Display keyboard config info
     println!("================================");
     println!("Keyboard Layout File  : {}", filename);
     println!("Keyboard Name         : {}", keyboard_name);
@@ -52,11 +57,16 @@ fn main() -> Result<(), Error> {
         println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
     }
 
+    // Initializes Tera templates
     let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
     let rendered_layout = create_layout(&keyboard_layout, &layout, verbose);
+
+    // Render our variables into the templates
     let evdev = create_evdev(&layout);
     let base_lst = create_lst(&layout, "base.lst");
     let evdev_lst = create_lst(&layout, "evdev.lst");
+
+    // Write Linux XKB templates to layouts output directory
     write_file(&rendered_layout, keyboard_name);
     write_file(&evdev, "evdev.xml");
     write_file(&base_lst, "base.lst");
