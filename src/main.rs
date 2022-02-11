@@ -3,6 +3,18 @@ use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
 use utils::layout::{Layout, create_layout, create_evdev, create_lst};
+use std::process::exit;
+
+pub fn boxtitle(title: &str) -> (String, String) {
+    (title.to_string(), "=".repeat(title.len()))
+}
+
+pub fn display(title: &str, msg: String) {
+    let boxtitle = boxtitle(title);
+    println!("{}", boxtitle.0);
+    println!("{}", msg);
+    println!("{}\n", boxtitle.1);
+}
 
 fn main() -> Result<(), Error> {
     // Create Unikey CLI
@@ -45,16 +57,19 @@ fn main() -> Result<(), Error> {
     let keyboard_desc = matches.value_of("desc").unwrap_or(desc);
 
     // Display keyboard config info
-    println!("================================");
-    println!("Keyboard Layout File  : {}", filename);
-    println!("Keyboard Name         : {}", keyboard_name);
-    println!("Keyboard Description  : {}", keyboard_desc);
+    display("================================",
+        format!(
+            concat!(
+            "Keyboard Layout File  : {}\n",
+            "Keyboard Name         : {}\n",
+            "Keyboard Description  : {}"), filename, keyboard_name, keyboard_desc
+            ));
 
     if verbose {
-        println!("=== Contents ===\n{}", contents);
-        println!("=== Keyboard Layout === \n{:?}\n", &keyboard_layout);
-        println!("=== Rows === \n{:?}\n", &keyboard_layout["rows"]);
-        println!("=== Row E === \n{:?}\n", &keyboard_layout["rows"]["e"]);
+        display("=== Contents ===", format!("{}", contents));
+        display("=== Keyboard Layout ===", format!("{:?}", &keyboard_layout));
+        display("=== Rows ===", format!("{:?}", &keyboard_layout["rows"]));
+        display("=== Row E ===", format!("{:?}", &keyboard_layout["rows"]["e"]));
     }
 
     // Initializes Tera templates
