@@ -5,31 +5,17 @@ use utils::files::{read_file, write_file};
 use utils::layout::{Layout, create_layout, create_evdev, create_lst};
 
 fn main() -> Result<(), Error> {
-    let app =
-        App::new("Unikey")
-        .setting(AppSettings::ArgRequiredElseHelp)
-        .help_message("Show this message")
-        .version_message("Show the current unikey version")
-        .version("0.1.0")
+    let app = App::new("Unikey")
+        .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
         .about("Create linux xkb keyboard layouts")
-        .arg(Arg::with_name("v")
-            .short("v")
-            .long("verbose")
-            .multiple(true)
-            .help("Show verbose output"))
-        .arg(Arg::with_name("keyboard_layout")
-            .help("Specify the file path to the keyboard layout config")
-            .required(true)
-            .index(1))
-        .arg(Arg::with_name("name")
-            .help("Specify the name of your keyboard layout")
-            .takes_value(true)
-            .index(2))
-        .arg(Arg::with_name("desc")
-            .help("Give a brief description for keyboard layout name. Ex. English (US)")
-            .takes_value(true)
-            .index(3));
+        .arg(Arg::new("v").help("Show verbose output"))
+        .arg(Arg::new("keyboard_layout")
+            .help("Specify the file path to the keyboard layout config"))
+        .arg(Arg::new("name")
+            .help("Specify the name of your keyboard layout"))
+        .arg(Arg::new("desc")
+            .help("Give a brief description for keyboard layout name. Ex. English (US)"));
 
     let mut borrow_app = app.clone();
     let matches = app.get_matches();

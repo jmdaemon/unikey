@@ -1,3 +1,6 @@
+fn main() {
+}
+
 #[cfg(test)]
 mod tests {
     use toml::Value;
