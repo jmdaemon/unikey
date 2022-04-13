@@ -1,5 +1,5 @@
 extern crate clap;
-
+use log::{debug, error, info, warn};
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
@@ -62,6 +62,8 @@ pub fn parse_misc() {
 }
 
 fn main() -> Result<(), Error> {
+    // Use logging
+    pretty_env_logger::init();
     let app = build_cli();
 
     // Print help message if user inputs -vv
@@ -97,13 +99,12 @@ fn main() -> Result<(), Error> {
     let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
     // Display keyboard config info
-    display("================================",
-        format!(
-            concat!(
-            "Keyboard Layout File  : {}\n",
-            "Keyboard Name         : {}\n",
-            "Keyboard Description  : {}"), kb_layout_fp, kb_name, kb_desc
-            ));
+    debug!("{}", "=".repeat(16));
+    debug!("Keyboard Config\n");
+    debug!("Keyboard Layout File: {}\n", kb_layout_fp);
+    debug!("Keyboard Name       : {}\n", kb_name);
+    debug!("Keyboard Descrption : {}\n", kb_desc);
+    debug!("{}", "=".repeat(16));
 
     if verbose {
         display("=== Contents ===", format!("{}", kb_layout_contents));
