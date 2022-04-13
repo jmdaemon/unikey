@@ -3,8 +3,8 @@ extern crate clap;
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
-use utils::files::{read_file, write_file};
-use utils::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
+use utility::files::{read_file, write_file};
+use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
 
 /// Pretty print a boxed title with a message inside

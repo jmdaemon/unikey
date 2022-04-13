@@ -12,10 +12,10 @@ tera = "1.15.0"
 failure = "0.1.8"
 
 [lib]
-name = "utils"
-path = "src/utils/mod.rs"
+name = "utility"
+path = "src/utility/mod.rs"
 
 # Unit Tests
 [[bin]]
-name = "tests-utils"
-path = "tests/utils/tests.rs"
+name = "tests-utility"
+path = "tests/utility/tests.rs"

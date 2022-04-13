@@ -5,7 +5,7 @@ fn main() {
 mod tests {
     use toml::Value;
     use failure::Error;
-    use utils::files::{read_file};
+    use utility::files::{read_file};
 
     #[test]
     fn can_read_files() {
