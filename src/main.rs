@@ -16,7 +16,7 @@ pub fn display(title: &str, msg: String) {
     println!("{}\n", boxtitle.1);
 }
 
-fn main() -> Result<(), Error> {
+pub fn build_cli() -> clap::App<'static> {
     // Create Unikey CLI
     let app = App::new("Unikey")
         .version("0.1.1")
@@ -29,6 +29,11 @@ fn main() -> Result<(), Error> {
             .help("Specify the name of your keyboard layout"))
         .arg(Arg::new("desc")
             .help("Give a brief description for keyboard layout name. Ex. English (US)"));
+    app
+}
+
+fn main() -> Result<(), Error> {
+    let app = build_cli();
 
     // Print help message if user inputs -vv
     let mut borrow_app = app.clone();
