@@ -1,3 +1,5 @@
+extern crate clap;
+
 use clap::{Arg, App, AppSettings};
 use toml::Value;
 use failure::Error;
@@ -22,7 +24,12 @@ pub fn build_cli() -> clap::App<'static> {
         .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
         .about("Create linux xkb keyboard layouts")
-        .arg(Arg::new("v").help("Show verbose output"))
+        .arg(Arg::new("v")
+            .short('v')
+            .long("verbose")
+            .required(false)
+            .help("Show verbose output")
+            )
         .arg(Arg::new("keyboard_layout")
             .help("Specify the file path to the keyboard layout config"))
         .arg(Arg::new("name")
