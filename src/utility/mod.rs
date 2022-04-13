@@ -6,12 +6,6 @@ pub mod files {
     use std::fs::File;
     use std::io::Write;
 
-    /// Reads an entire file into a string
-    pub fn read_file(filename: &str) -> String {
-        return fs::read_to_string(filename)
-            .expect("Unable to read keyboard layout file").to_owned();
-    }
-
     /// Writes a keyboard layout to disk
     /// This creates the layouts directory.
     /// Note that this directory will be customizable in the future.

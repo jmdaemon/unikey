@@ -3,7 +3,9 @@ extern crate clap;
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
-use utility::files::{read_file, write_file};
+//use utility::files::{read_to_string, write_file};
+use std::fs::read_to_string;
+use utility::files::{write_file};
 use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
 
@@ -83,7 +85,7 @@ fn main() -> Result<(), Error> {
 
     // Parse arguments
     let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
-    let contents = read_file(filename);
+    let contents = read_to_string(filename).expect("Could not read keyboard layout file");
     let keyboard_layout: Value = toml::from_str(&contents)?;
     let config = &keyboard_layout["config"];
 
