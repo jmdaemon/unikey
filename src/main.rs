@@ -26,14 +26,9 @@ pub fn build_cli() -> clap::Command<'static> {
             .short('v')
             .long("verbose")
             .required(false)
-            .help("Show verbose output")
-            )
+            .help("Show verbose output"))
         .arg(Arg::new("keyboard_layout")
-            .help("Specify the file path to the keyboard layout config"))
-        .arg(Arg::new("name")
-            .help("Specify the name of your keyboard layout"))
-        .arg(Arg::new("desc")
-            .help("Give a brief description for keyboard layout name. Ex. English (US)"));
+            .help("Specify the file path to the keyboard layout config"));
     app
 }
 
@@ -96,13 +91,10 @@ fn main() -> Result<(), Error> {
 
     let kb_config = &kb_layout["config"];
 
-    let config = &kb_config;
-
     // Parse keyboard config
-    let name = config.get("name").unwrap().as_str().unwrap_or("us");
-    let desc = config.get("desc").unwrap().as_str().unwrap_or("English (US)");
-    let keyboard_name = matches.value_of("name").unwrap_or(name);
-    let keyboard_desc = matches.value_of("desc").unwrap_or(desc);
+    // Default to us, English (US) layout
+    let kb_name = kb_config["name"].as_str().unwrap_or("us");
+    let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
     // Display keyboard config info
     display("================================",
@@ -110,7 +102,7 @@ fn main() -> Result<(), Error> {
             concat!(
             "Keyboard Layout File  : {}\n",
             "Keyboard Name         : {}\n",
-            "Keyboard Description  : {}"), kb_layout_fp, keyboard_name, keyboard_desc
+            "Keyboard Description  : {}"), kb_layout_fp, kb_name, kb_desc
             ));
 
     if verbose {
@@ -121,7 +113,7 @@ fn main() -> Result<(), Error> {
     }
 
     // Initializes Tera templates
-    let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
+    let layout: Layout = Layout::new(kb_name, kb_desc);
     let ekeys = &kb_layout["rows"]["e"].as_array();
     for key in ekeys.unwrap().iter() {
         //let skey = key.to_string();
@@ -146,7 +138,7 @@ fn main() -> Result<(), Error> {
     let evdev_lst = create_lst(&layout, "evdev.lst");
 
     // Write Linux XKB templates to layouts output directory
-    write_file(&rendered_layout, keyboard_name);
+    write_file(&rendered_layout, kb_name);
     write_file(&evdev, "evdev.xml");
     write_file(&base_lst, "base.lst");
     write_file(&evdev_lst, "evdev.lst");
