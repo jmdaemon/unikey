@@ -1,6 +1,6 @@
 extern crate clap;
 
-use clap::{Arg, App, AppSettings};
+use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
@@ -18,9 +18,9 @@ pub fn display(title: &str, msg: String) {
     println!("{}\n", boxtitle.1);
 }
 
-pub fn build_cli() -> clap::App<'static> {
+pub fn build_cli() -> clap::Command<'static> {
     // Create Unikey CLI
-    let app = App::new("Unikey")
+    let app = Command::new("Unikey")
         .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
         .about("Create linux xkb keyboard layouts")
