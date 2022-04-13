@@ -2,7 +2,6 @@ pub mod files {
     /**
     * Utilities for reading and writing to files
     */
-    use std::fs;
     use std::fs::File;
     use std::io::Write;
 
