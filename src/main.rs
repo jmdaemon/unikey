@@ -7,15 +7,11 @@ use utils::files::{read_file, write_file};
 use utils::layout::{KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
 
-pub fn boxtitle(title: &str) -> (String, String) {
-    (title.to_string(), "=".repeat(title.len()))
-}
-
+/// Pretty print a boxed title with a message inside
 pub fn display(title: &str, msg: String) {
-    let boxtitle = boxtitle(title);
-    println!("{}", boxtitle.0);
+    println!("{}", title);
     println!("{}", msg);
-    println!("{}\n", boxtitle.1);
+    println!("{}\n", "=".repeat(title.len()));
 }
 
 pub fn build_cli() -> clap::Command<'static> {
