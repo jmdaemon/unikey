@@ -4,7 +4,7 @@ use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
-use utils::layout::{KeyMap, Layout, create_layout, create_evdev, create_lst};
+use utils::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
 
 /// Pretty print a boxed title with a message inside
@@ -33,6 +33,35 @@ pub fn build_cli() -> clap::Command<'static> {
         .arg(Arg::new("desc")
             .help("Give a brief description for keyboard layout name. Ex. English (US)"));
     app
+}
+
+const ROWS: [&str; 4] = ["e", "d", "c", "b"];
+
+/// Returns a vector of keys from a keyboard layout
+pub fn parse_rows(keyboard_layout: Value) -> Vec<Keys> {
+    // Create a vector of keys
+    let mut row_keys: Vec<Keys> = vec![];
+
+    // For every row in the row of keys
+    for row_name in ROWS {
+        // Get the current row
+        let row = &keyboard_layout["rows"][&row_name];
+
+        // Get all the keys values for that row
+        let key_values = row.as_array().unwrap();
+
+        // Convert the key values to a vector of strings
+        let mut keys: Vec<String> = vec![];
+        for key in key_values {
+            keys.push(key.to_string());
+        }
+        // Add the keys for that row to the vector
+        row_keys.push(Keys { keys: keys });
+    }
+    row_keys
+}
+
+pub fn parse_misc() {
 }
 
 fn main() -> Result<(), Error> {
