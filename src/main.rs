@@ -84,10 +84,19 @@ fn main() -> Result<(), Error> {
     }
 
     // Parse arguments
-    let filename = matches.value_of("keyboard_layout").expect("Keyboard layout file was not found.");
-    let contents = read_to_string(filename).expect("Could not read keyboard layout file");
-    let keyboard_layout: Value = toml::from_str(&contents)?;
-    let config = &keyboard_layout["config"];
+    let kb_layout_fp = matches
+        .value_of("keyboard_layout")
+        .expect("Keyboard layout config was not found.");
+
+    let kb_layout_contents = read_to_string(kb_layout_fp)
+        .expect("Could not read keyboard layout config");
+
+    let kb_layout: Value = toml::from_str(&kb_layout_contents)
+        .expect("Could not parse keyboard layout config");
+
+    let kb_config = &kb_layout["config"];
+
+    let config = &kb_config;
 
     // Parse keyboard config
     let name = config.get("name").unwrap().as_str().unwrap_or("us");
@@ -101,34 +110,35 @@ fn main() -> Result<(), Error> {
             concat!(
             "Keyboard Layout File  : {}\n",
             "Keyboard Name         : {}\n",
-            "Keyboard Description  : {}"), filename, keyboard_name, keyboard_desc
+            "Keyboard Description  : {}"), kb_layout_fp, keyboard_name, keyboard_desc
             ));
 
     if verbose {
-        display("=== Contents ===", format!("{}", contents));
-        display("=== Keyboard Layout ===", format!("{:?}", &keyboard_layout));
-        display("=== Rows ===", format!("{:?}", &keyboard_layout["rows"]));
-        display("=== Row E ===", format!("{:?}", &keyboard_layout["rows"]["e"]));
+        display("=== Contents ===", format!("{}", kb_layout_contents));
+        display("=== Keyboard Layout ===", format!("{:?}", &kb_layout));
+        display("=== Rows ===", format!("{:?}", &kb_layout["rows"]));
+        display("=== Row E ===", format!("{:?}", &kb_layout["rows"]["e"]));
     }
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
-    let ekeys = &keyboard_layout["rows"]["e"].as_array();
+    let ekeys = &kb_layout["rows"]["e"].as_array();
     for key in ekeys.unwrap().iter() {
         //let skey = key.to_string();
         //println!("{}", skey)
         println!("Key: {}", key)
     }
 
-    let kmap: KeyMap = KeyMap::new(keyboard_layout);
+    let kmap: KeyMap = KeyMap::new(kb_layout);
     //println!("{:?}", kmap.keys.keys);
     for rows in kmap.keys.iter() {
         for keys in rows.keys.iter() {
             println!("{}", keys.to_string());
         }
     }
+
     exit(0);
-    let rendered_layout = create_layout(&keyboard_layout, &layout, verbose);
+    let rendered_layout = create_layout(&kb_layout, &layout, verbose);
 
     // Render our variables into the templates
     let evdev = create_evdev(&layout);
