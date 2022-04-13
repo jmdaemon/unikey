@@ -2,7 +2,7 @@ use clap::{Arg, App, AppSettings};
 use toml::Value;
 use failure::Error;
 use utils::files::{read_file, write_file};
-use utils::layout::{Layout, create_layout, create_evdev, create_lst};
+use utils::layout::{KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
 
 pub fn boxtitle(title: &str) -> (String, String) {
@@ -74,6 +74,21 @@ fn main() -> Result<(), Error> {
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(keyboard_name, keyboard_desc);
+    let ekeys = &keyboard_layout["rows"]["e"].as_array();
+    for key in ekeys.unwrap().iter() {
+        //let skey = key.to_string();
+        //println!("{}", skey)
+        println!("Key: {}", key)
+    }
+
+    let kmap: KeyMap = KeyMap::new(keyboard_layout);
+    //println!("{:?}", kmap.keys.keys);
+    for rows in kmap.keys.iter() {
+        for keys in rows.keys.iter() {
+            println!("{}", keys.to_string());
+        }
+    }
+    exit(0);
     let rendered_layout = create_layout(&keyboard_layout, &layout, verbose);
 
     // Render our variables into the templates

@@ -32,13 +32,49 @@ pub mod layout {
     use std::collections::HashMap;
     use std::process::exit;
 
+    pub struct Keys {
+        //pub keys: Vec<Value>
+        pub keys: Vec<String>
+    }
+
+    impl Keys {
+        //pub fn new(row_keys: Vec<Value>) -> Keys {
+        pub fn new(row_keys: Vec<String>) -> Keys {
+            Keys { keys: row_keys }
+        }
+    }
+
+    pub struct KeyMap {
+        pub keys: Vec<Keys>
+    }
+
+    impl KeyMap {
+        pub fn new(keyboard_layout: Value) -> KeyMap {
+            let mut row_keys: Vec<Keys> = vec![];
+            //let rows = ["e", "d", "c", "b", "misc"];
+            let rows = ["e", "d", "c", "b"];
+            for row in rows {
+                let currow = &keyboard_layout["rows"][&row];
+                let keyvec = currow.as_array().unwrap();
+                let mut vecstr: Vec<String> = vec![];
+                for key in keyvec { vecstr.push(key.to_string()); }
+                //&row_keys.push(Keys { keys: currow.as_array().unwrap().to_vec() });
+                //&row_keys.push(Keys { keys: currow.as_array().unwrap().to_vec() });
+                row_keys.push(Keys { keys: vecstr });
+            }
+        KeyMap { keys: row_keys }
+        }
+    }
+
+
     pub struct Layout {
         pub name: String,
         pub desc: String
     }
 
     impl Layout {
-        pub fn new<S: Into<String>>(name: S, desc: S) ->Layout {
+        // Pass in either &str, or String
+        pub fn new<S: Into<String>>(name: S, desc: S) -> Layout {
             Layout { name: name.into(), desc: desc.into() }
         }
     }
