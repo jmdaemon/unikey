@@ -58,8 +58,8 @@ pub fn parse_rows(kb_layout: &Value) -> HashMap<&str, Keys> {
 pub fn parse_misc(kb_layout: &Value) -> HashMap<&str, String> {
     let mut row_misc: HashMap<&str, String> = HashMap::new();
     let kb_misc = &kb_layout["rows"]["misc"];
-    row_misc.insert("BKSL", kb_misc["BKSL"].to_string());
-    row_misc.insert("TLDE", kb_misc["TLDE"].to_string());
+    row_misc.insert("misc_BKSL", kb_misc["BKSL"].to_string());
+    row_misc.insert("misc_TLDE", kb_misc["TLDE"].to_string());
     row_misc
 }
 
@@ -99,12 +99,13 @@ pub fn populate_row_keys(mut context: &mut Context, kb: &KeyboardLayout) {
     for (row, keys) in &kb.kb_rows {
         info!("Row: {}", row);
 
-        let index = 1;
+        let mut index = 1;
         let keys = &keys.keys;
         for keyval in keys {
             info!("Key value: {}", keyval);
             let key_index = format!("{}_key_{}", row, index);
             context.insert(key_index, &keyval);
+            index += 1;
         }
     }
 }
