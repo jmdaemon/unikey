@@ -176,6 +176,7 @@ fn main() {
     }
 
     let kb_output_fp = matches.value_of("output").unwrap();
+    let kb_type = matches.value_of("kb_type").unwrap();
     let kb_layout_fp = matches
         .value_of("kb_layout_fp")
         .expect("Keyboard layout config was not found.");
