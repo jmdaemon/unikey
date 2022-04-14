@@ -138,7 +138,6 @@ pub fn render_template(tera: &Tera, template: &str, context: &mut Context) -> St
 /// Format the rendered content to a string
 pub fn format_rendered(title: &str, rendered: &str) -> String {
     let mut result = "".to_owned();
-    result.push_str(&format!("Rendered Template: \n"));
     result.push_str(&format!("{}\n", title));
     result.push_str(&format!("{}\n", "=".repeat(16)));
     result.push_str(&format!("{}\n", rendered));
@@ -146,12 +145,11 @@ pub fn format_rendered(title: &str, rendered: &str) -> String {
     result
 }
 
-/// Displays the rendered template and exits if dryrun was specified
+/// Displays the rendered template
 pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
     let format_rendered = format_rendered(title, &rendered.to_string());
     if dryrun {
         println!("{}", format_rendered);
-        exit(0); // Exit early after printing the template
     } else {
         info!("{}", format_rendered);
     }
@@ -217,14 +215,22 @@ fn main() -> Result<(), Error> {
     // Populate the evdev template
     let mut evdev_context = populate_context(&kb);
     let rendered_evdev = render_template(&tera, "evdev.xml.tmpl", &mut evdev_context);
+    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_evdev);
 
     // Populate the base.lst template
     let mut base_lst_context = populate_context(&kb);
     let rendered_base_lst = render_template(&tera, "base.lst.tmpl", &mut base_lst_context);
+    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_base_lst);
 
     // Populate the evdev.lst template
     let mut evdev_lst_context = populate_context(&kb);
     let rendered_evdev_lst = render_template(&tera, "evdev.lst.tmpl", &mut evdev_lst_context);
+    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_evdev_lst);
+
+    if dryrun {
+        // Exit early after printing the template
+        exit(0); 
+    }
 
     // Store rendered templates in vector
     // For every rendered template
