@@ -205,6 +205,10 @@ fn main() -> Result<(), Error> {
         info!("{}\n", rendered);
         info!("{}", "=".repeat(16));
     }
+
+    // Populate the evdev layout
+    let mut evdev_context = populate_context(&kb);
+    let rendered_evdev = tera.render("evdev.xml.tmpl", &evdev_context).expect("Template failed to render");
     
     // Populate templates with values from keyboard config
     // Store rendered templates in vector
