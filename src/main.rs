@@ -2,14 +2,12 @@
 use unikey::keyboard::{Keys, KeyboardLayout, show_kb_layout};
 use unikey::tmpl::{init_tera};
 use unikey::parse::{parse_rows, parse_misc};
-//use unikey::tmpl::linux::{populate_linux_kb_definition, populate_linux_kb};
 use unikey::linux::{populate_linux_kb};
 
 // Third Party Crates
-
 use log::error;
-use clap::{Arg, Command};
 use toml::Value;
+use clap::{Arg, Command};
 
 // Standard Library
 use std::process::exit;
