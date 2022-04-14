@@ -120,7 +120,7 @@ pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
     }
 }
 
-pub fn init_context(kb: &KeyboardLayout) -> Context {
+pub fn populate_context(kb: &KeyboardLayout) -> Context {
     let mut context = Context::new();
     context.insert("layout_name", &kb.kb_name);
     context.insert("layout_desc", &kb.kb_desc);
@@ -175,7 +175,7 @@ fn main() -> Result<(), Error> {
     let tera = init_tera();
 
     // Initialize the template context
-    let mut context = init_context(&kb);
+    let mut context = populate_context(&kb);
     populate_row_keys(&mut context, &kb);
     populate_misc_keys(&mut context, &kb);
 
