@@ -161,11 +161,36 @@ pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
     }
 }
 
+/// Populate evdev.xml, base.lst, evdev.lst templates
 pub fn populate_linux_kb_definition(kb: &KeyboardLayout, dryrun: bool, tera: &Tera, template: &str) -> String {
     let mut context = populate_context(&kb);
     let rendered_template = render_template(&tera, template, &mut context);
     show_rendered(dryrun, "Linux Keyboard Definition", &rendered_template);
     rendered_template.to_string()
+}
+
+//pub fn populate_linux_kb<'a> (kb: &'a KeyboardLayout, dryrun: bool, tera: &Tera) -> HashMap<String, &'static str> {
+pub fn populate_linux_kb(kb: &KeyboardLayout, dryrun: bool, tera: &Tera) -> HashMap<String, String> {
+    // Populate the layout template
+    let mut layout_context = populate_context(&kb);
+    populate_row_keys(&mut layout_context, &kb);
+    populate_misc_keys(&mut layout_context, &kb);
+
+    let rendered_layout = render_template(&tera, "layout.tmpl", &mut layout_context);
+    show_rendered(dryrun, "Linux Keyboard Layout", &rendered_layout);
+
+    let rendered_evdev = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.xml.tmpl");
+    let rendered_base_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "base.lst.tmpl");
+    let rendered_evdev_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.lst.tmpl");
+
+    // Create a hashmap containing the output file name, and its rendered contents
+    let mut rendered: HashMap<String, String> = HashMap::new();
+    //rendered.insert(&kb.kb_name, &rendered_layout);
+    rendered.insert(kb.kb_name.to_string(), rendered_layout);
+    rendered.insert("evdev.xml".to_string(), rendered_evdev);
+    rendered.insert("base.lst".to_string(), rendered_base_lst);
+    rendered.insert("evdev.lst".to_string(), rendered_evdev_lst);
+    rendered
 }
 
 fn main() {
@@ -216,31 +241,14 @@ fn main() {
     let tera = init_tera();
 
     // Populate templates with values from keyboard config
-
-    // Populate the layout template
-    let mut layout_context = populate_context(&kb);
-    populate_row_keys(&mut layout_context, &kb);
-    populate_misc_keys(&mut layout_context, &kb);
-
-    let rendered_layout = render_template(&tera, "layout.tmpl", &mut layout_context);
-    show_rendered(dryrun, "Linux Keyboard Layout", &rendered_layout);
-
-    // Populate evdev.xml, base.lst, evdev.lst templates
-    let rendered_evdev = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.xml.tmpl");
-    let rendered_base_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "base.lst.tmpl");
-    let rendered_evdev_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.lst.tmpl");
+    let rendered = populate_linux_kb(&kb, dryrun, &tera);
 
     if dryrun {
         // Exit early after printing the template
         exit(0); 
     }
 
-    // Create a hashmap containing the output file name, and its rendered contents
-    let mut rendered: HashMap<&str, &str> = HashMap::new();
-    rendered.insert(&kb.kb_name, &rendered_layout);
-    rendered.insert("evdev.xml", &rendered_evdev);
-    rendered.insert("base.lst", &rendered_base_lst);
-    rendered.insert("evdev.lst", &rendered_evdev_lst);
+
 
     println!("Writing rendered templates to {}", kb_output_fp);
 
