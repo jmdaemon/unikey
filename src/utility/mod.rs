@@ -1,21 +1,3 @@
-pub mod files {
-    /**
-    * Utilities for reading and writing to files
-    */
-    use std::fs::File;
-    use std::io::Write;
-
-    /// Writes a keyboard layout to disk
-    /// This creates the layouts directory.
-    /// Note that this directory will be customizable in the future.
-    pub fn write_file(keyboard_layout: &str, filename: &str) {
-        let mut f = File::create(["layouts", filename].join("/")).expect("Unable to create file");
-        f.write_all(keyboard_layout.as_bytes()).expect("Unable to write data");
-    }
-
-}
-
-
 pub mod layout {
     /**
     * Manage Linux XKB layouts

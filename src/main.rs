@@ -3,11 +3,9 @@ use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
 use std::fs::{read_to_string, write, create_dir_all};
-use std::io::Write;
 use std::collections::HashMap;
-use utility::files::{write_file};
 use tera::{Tera, Context};
-use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst, init_tera};
+use utility::layout::{Keys, init_tera};
 use std::process::exit;
 
 pub fn build_cli() -> clap::Command<'static> {
@@ -199,7 +197,6 @@ fn main() -> Result<(), Error> {
     // Store output in KeyboardLayout
     let kb = KeyboardLayout::new(kb_name, kb_desc, kb_rows, kb_misc);
 
-
     // Initialize Tera
     let tera = init_tera();
 
@@ -249,37 +246,6 @@ fn main() -> Result<(), Error> {
         // Write the template to the output folder
         write(fp, contents).expect("Unable to write file");
     }
-    exit(0);
-
-    // Initializes Tera templates
-    let layout: Layout = Layout::new(kb_name, kb_desc);
-    let ekeys = &kb_layout["rows"]["e"].as_array();
-    for key in ekeys.unwrap().iter() {
-        //let skey = key.to_string();
-        //println!("{}", skey)
-        println!("Key: {}", key)
-    }
-
-    let kmap: KeyMap = KeyMap::new(kb_layout);
-    //println!("{:?}", kmap.keys.keys);
-    for rows in kmap.keys.iter() {
-        for keys in rows.keys.iter() {
-            println!("{}", keys.to_string());
-        }
-    }
-
-    let rendered_layout = create_layout(&kb_layout, &layout, false);
-
-    // Render our variables into the templates
-    let evdev = create_evdev(&layout);
-    let base_lst = create_lst(&layout, "base.lst");
-    let evdev_lst = create_lst(&layout, "evdev.lst");
-
-    // Write Linux XKB templates to layouts output directory
-    write_file(&rendered_layout, kb_name);
-    write_file(&evdev, "evdev.xml");
-    write_file(&base_lst, "base.lst");
-    write_file(&evdev_lst, "evdev.lst");
     
     Ok(())
 }
