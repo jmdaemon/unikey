@@ -3,7 +3,8 @@ use log::{debug, info, error};
 use clap::{Arg, Command};
 use tera::{Tera, Context};
 use toml::Value;
-use utility::layout::{Keys, init_tera};
+//use utility::layout::{Keys, init_tera};
+use utility::layout::{Keys};
 
 // Standard Library
 use std::process::exit;
@@ -193,6 +194,18 @@ pub fn populate_linux_kb(kb: &KeyboardLayout, dryrun: bool, tera: &Tera) -> Hash
     rendered
 }
 
+pub fn init_tera(kb_type: &str) -> Tera {
+    let tera = match Tera::new(&format!("templates/{}/**/*.tmpl", kb_type)) {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Parsing error(s): {}", e);
+            exit(1);
+        }
+    };
+    return tera;
+}
+
+
 fn main() {
     // Use logging
     pretty_env_logger::init();
@@ -238,7 +251,7 @@ fn main() {
     let kb = KeyboardLayout::new(kb_name, kb_desc, kb_rows, kb_misc);
 
     // Initialize Tera
-    let tera = init_tera();
+    let tera = init_tera(kb_type);
 
     let mut rendered: HashMap<String, String> = HashMap::new();
     match kb_type {
@@ -256,13 +269,14 @@ fn main() {
         // Exit early after printing the template
         exit(0); 
     }
-    println!("Writing rendered templates to {}", kb_output_fp);
 
     // Create directory if it doesn't exist
+    println!("Writing rendered templates to {}", kb_output_fp);
     create_dir_all(kb_output_fp).expect(&format!("Directory {} could not be created", kb_output_fp));
+
+    // Write the template to the output folder
     for (filename, contents) in rendered {
         let fp = format!("{}/{}", kb_output_fp, filename);
-        // Write the template to the output folder
         write(fp, contents).expect("Unable to write file");
     }
 }
