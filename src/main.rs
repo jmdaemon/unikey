@@ -13,8 +13,12 @@ pub fn build_cli() -> clap::Command<'static> {
         .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
         .about("Create linux xkb keyboard layouts")
-        .arg(Arg::new("keyboard_layout")
-            .help("Specify the file path to the keyboard layout config"));
+        .arg(Arg::new("kb_layout_fp")
+            .required(true)
+            .help("File path to the keyboard layout toml file"))
+        .arg(Arg::new("output")
+            .default_value("./layouts")
+            .help("Output directory"));
     app
 }
 
@@ -56,8 +60,9 @@ fn main() -> Result<(), Error> {
     let matches = app.get_matches();
 
     // Parse arguments
+    let kb_output_fp = matches.value_of("output").unwrap();
     let kb_layout_fp = matches
-        .value_of("keyboard_layout")
+        .value_of("kb_layout_fp")
         .expect("Keyboard layout config was not found.");
 
     let kb_layout_contents = read_to_string(kb_layout_fp)
