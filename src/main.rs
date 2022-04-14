@@ -146,26 +146,14 @@ pub fn format_rendered(title: &str, rendered: &str) -> String {
     result
 }
 
-/// Displays the rendered template
-pub fn show_rendered(dryrun: bool, rendered: &str) {
-    let format_rendered = format_rendered("Linux Keyboard Layout", &rendered.to_string());
+/// Displays the rendered template and exits if dryrun was specified
+pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
+    let format_rendered = format_rendered(title, &rendered.to_string());
     if dryrun {
-        //println!("Rendered Template: ");
-        //println!("Linux Keyboard Layout");
-        //println!("{}", "=".repeat(16));
-        //println!("{}\n", rendered);
-        //println!("{}", "=".repeat(16));
-        //println!();
         println!("{}", format_rendered);
         exit(0); // Exit early after printing the template
     } else {
         info!("{}", format_rendered);
-        //info!(format_rendered("Linux Keyboard Layout", rendered.to_string()));
-        //info!("Rendered Template: ");
-        //info!("Linux Keyboard Layout");
-        //info!("{}", "=".repeat(16));
-        //info!("{}\n", rendered);
-        //info!("{}", "=".repeat(16));
     }
 }
 
@@ -225,8 +213,7 @@ fn main() -> Result<(), Error> {
 
     //let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
     let rendered = render_template(&tera, "layout.tmpl", &mut context);
-    show_rendered(dryrun, &rendered);
-
+    show_rendered(dryrun, "Linux Keyboard Layout", &rendered);
 
     // Populate the evdev layout
     let mut evdev_context = populate_context(&kb);
