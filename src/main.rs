@@ -95,7 +95,7 @@ impl KeyboardLayout <'static, 'static> {
 }
 
 /// Populate the Tera Context with the row key values
-pub fn populate_row_keys(mut context: &mut Context, kb: &KeyboardLayout) {
+pub fn populate_row_keys(context: &mut Context, kb: &KeyboardLayout) {
     for (row, keys) in &kb.kb_rows {
         info!("Row: {}", row);
 
@@ -110,7 +110,7 @@ pub fn populate_row_keys(mut context: &mut Context, kb: &KeyboardLayout) {
     }
 }
 
-pub fn populate_misc_keys(mut context: &mut Context, kb: &KeyboardLayout) {
+pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
     let kb_misc = &kb.kb_misc;
     for (key, val) in kb_misc.iter() {
         let key_index = format!("misc_{}", key);
