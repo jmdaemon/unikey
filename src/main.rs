@@ -204,7 +204,7 @@ fn main() -> Result<(), Error> {
     // Initialize Tera
     let tera = init_tera();
 
-    // Initialize templates
+    // Populate templates with values from keyboard config
     // Populate the layout template
     // Initialize the template context
     let mut context = populate_context(&kb);
@@ -215,11 +215,17 @@ fn main() -> Result<(), Error> {
     let rendered = render_template(&tera, "layout.tmpl", &mut context);
     show_rendered(dryrun, "Linux Keyboard Layout", &rendered);
 
-    // Populate the evdev layout
+    // Populate the evdev template
     let mut evdev_context = populate_context(&kb);
-    let rendered_evdev = tera.render("evdev.xml.tmpl", &evdev_context).expect("Template failed to render");
+    //let rendered_evdev = tera.render("evdev.xml.tmpl", &evdev_context).expect("Template failed to render");
+    let rendered_evdev = render_template(&tera, "evdev.xml.tmpl", &mut evdev_context);
+
+    // Populate the base.lst template
+    let mut base_lst_context = populate_context(&kb);
+    //let rendered_base_lst = tera.render("base.lst.tmpl", &evdev_context).expect("Template failed to render");
+    let rendered_base_lst = render_template(&tera, "base.lst.tmpl", &mut evdev_context);
+
     
-    // Populate templates with values from keyboard config
     // Store rendered templates in vector
     // For every rendered template
     // Write template to output folder
