@@ -207,13 +207,12 @@ fn main() -> Result<(), Error> {
     // Populate templates with values from keyboard config
     // Populate the layout template
     // Initialize the template context
-    let mut context = populate_context(&kb);
-    populate_row_keys(&mut context, &kb);
-    populate_misc_keys(&mut context, &kb);
+    let mut layout_context = populate_context(&kb);
+    populate_row_keys(&mut layout_context, &kb);
+    populate_misc_keys(&mut layout_context, &kb);
 
-    //let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
-    let rendered = render_template(&tera, "layout.tmpl", &mut context);
-    show_rendered(dryrun, "Linux Keyboard Layout", &rendered);
+    let rendered_layout = render_template(&tera, "layout.tmpl", &mut layout_context);
+    show_rendered(dryrun, "Linux Keyboard Layout", &rendered_layout);
 
     // Populate the evdev template
     let mut evdev_context = populate_context(&kb);
