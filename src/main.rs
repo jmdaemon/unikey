@@ -110,6 +110,7 @@ pub fn populate_row_keys(context: &mut Context, kb: &KeyboardLayout) {
     }
 }
 
+/// Populate the Tera Context with the misc key values
 pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
     let kb_misc = &kb.kb_misc;
     for (key, val) in kb_misc.iter() {
@@ -120,11 +121,18 @@ pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
     }
 }
 
+/// Populate the Tera Context with the keyboard name and description values
 pub fn populate_context(kb: &KeyboardLayout) -> Context {
     let mut context = Context::new();
     context.insert("layout_name", &kb.kb_name);
     context.insert("layout_desc", &kb.kb_desc);
     context
+}
+
+/// Renders the template with the Tera Context to a string
+pub fn render_template(tera: &Tera, template: &str, context: &mut Context) -> String {
+    let rendered = tera.render(template, &context).expect("Template failed to render");
+    rendered.to_string()
 }
 
 fn main() -> Result<(), Error> {
@@ -174,13 +182,15 @@ fn main() -> Result<(), Error> {
     // Initialize Tera
     let tera = init_tera();
 
+    // Initialize templates
+    // Populate the layout template
     // Initialize the template context
     let mut context = populate_context(&kb);
     populate_row_keys(&mut context, &kb);
     populate_misc_keys(&mut context, &kb);
 
-    // Initialize templates
-    let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
+    //let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
+    let rendered = render_template(&tera, "layout.tmpl", &mut context);
     if dryrun {
         println!("Rendered Template: ");
         println!("Linux Keyboard Layout");
