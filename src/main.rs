@@ -25,20 +25,15 @@ pub fn build_cli() -> clap::Command<'static> {
 
 const ROWS: [&str; 4] = ["e", "d", "c", "b"];
 
-/// Returns a vector of keys from a keyboard layout
-//pub fn parse_rows(keyboard_layout: &Value) -> Vec<Keys> {
-//pub fn parse_rows(keyboard_layout: &Value) -> HashMap<&str, Vec<Keys>> {
-pub fn parse_rows(keyboard_layout: &Value) -> HashMap<&str, Keys> {
-    // Create a vector of keys
-    //let mut row_keys: Vec<Keys> = vec![];
-    //let mut row_keys: HashMap<&str, Vec<Keys>> = HashMap::new();
+/// Returns a HashMap of keys from a keyboard layout
+pub fn parse_rows(kb_layout: &Value) -> HashMap<&str, Keys> {
     let mut row_keys: HashMap<&str, Keys> = HashMap::new();
 
     // For every row in the row of keys
     for row_name in ROWS {
 
         // Get the current row
-        let row = &keyboard_layout["rows"][&row_name];
+        let row = &kb_layout["rows"][&row_name];
 
         // Get all the keys values for that row
         let key_values = row.as_array().unwrap();
@@ -48,15 +43,17 @@ pub fn parse_rows(keyboard_layout: &Value) -> HashMap<&str, Keys> {
         for key in key_values {
             keys.push(key.to_string());
         }
-        // Add the keys for that row to the vector
-        //row_keys.push(row_name, Keys { keys: keys });
+        // Add the keys for the row
         row_keys.insert(row_name, Keys { keys: keys });
     }
     row_keys
 }
 
-pub fn parse_misc(keyboard_layout: &Value) -> HashMap<&str, String> {
-    let row_misc: HashMap<&str, String> = HashMap::new();
+pub fn parse_misc(kb_layout: &Value) -> HashMap<&str, String> {
+    let mut row_misc: HashMap<&str, String> = HashMap::new();
+    let kb_misc = &kb_layout["rows"]["misc"];
+    row_misc.insert("BKSL", kb_misc["BKSL"].to_string());
+    row_misc.insert("TLDE", kb_misc["TLDE"].to_string());
     row_misc
 }
 
@@ -76,10 +73,22 @@ pub fn show_kb_layout(
     debug!("{}", "=".repeat(16));
 }
 
-struct KeyboardLayout {
-    pub name: String,
-    pub desc: String,
+#[derive(Default, Debug)]
+struct KeyboardLayout<'a, 'b> {
+    pub kb_name: &'b str,
+    pub kb_desc: &'b str,
+    pub kb_rows: HashMap<&'a str, Keys>,
+    pub kb_misc: HashMap<&'a str, String>
+}
 
+impl KeyboardLayout <'static, 'static> {
+    pub fn new<'a, 'b> (
+            kb_name: &'b str,
+            kb_desc: &'b str,
+            kb_rows: HashMap<&'a str, Keys>,
+            kb_misc: HashMap<&'a str, String>) -> KeyboardLayout<'a, 'b> {
+        KeyboardLayout { kb_name, kb_desc, kb_rows, kb_misc }
+    }
 }
 
 fn main() -> Result<(), Error> {
@@ -113,10 +122,19 @@ fn main() -> Result<(), Error> {
     show_kb_layout(kb_output_fp, kb_name, kb_desc, kb_layout_contents);
 
     // Parse keys in keyboard config
+    // Note that misc keys are handled separately from the normal keys
     let kb_rows: HashMap<&str, Keys> = parse_rows(&kb_layout);
     let kb_misc: HashMap<&str, String> = parse_misc(&kb_layout);
 
     // Store output in KeyboardLayout
+    let kb = KeyboardLayout::new(kb_name, kb_desc, kb_rows, kb_misc);
+
+    // Access fields in kb
+    println!("{}\n", kb.kb_name);
+    println!("{}\n", kb.kb_desc);
+    println!("{:?}\n", kb.kb_rows);
+    println!("{:?}\n", kb.kb_misc);
+
 
     // Initialize templates
     // Populate templates with values from keyboard config

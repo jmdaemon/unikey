@@ -25,6 +25,7 @@ pub mod layout {
     use std::collections::HashMap;
     use std::process::exit;
 
+    #[derive(Default, Debug)]
     pub struct Keys {
         //pub keys: Vec<Value>
         pub keys: Vec<String>
