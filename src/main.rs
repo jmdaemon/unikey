@@ -51,6 +51,24 @@ pub fn parse_rows(keyboard_layout: Value) -> Vec<Keys> {
 pub fn parse_misc() {
 }
 
+/// Display keyboard config debug info
+pub fn show_kb_layout(
+    kb_layout_fp: &str, kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
+
+    println!("Parsing keyboard config");
+    debug!("Keyboard Config\n");
+    debug!("{}", "=".repeat(16));
+    debug!("Keyboard Layout File: {}\n", kb_layout_fp);
+    debug!("Keyboard Name       : {}\n", kb_name);
+    debug!("Keyboard Descrption : {}\n", kb_desc);
+    debug!("{}", "=".repeat(16));
+
+    debug!("Keyboard Config Contents: ");
+    debug!("{}", "=".repeat(16));
+    debug!("{}\n", kb_layout_contents);
+    debug!("{}", "=".repeat(16));
+}
+
 fn main() -> Result<(), Error> {
     // Use logging
     pretty_env_logger::init();
@@ -65,8 +83,8 @@ fn main() -> Result<(), Error> {
         .value_of("kb_layout_fp")
         .expect("Keyboard layout config was not found.");
 
-    let kb_layout_contents = read_to_string(kb_layout_fp)
-        .expect("Could not read keyboard layout config");
+    let kb_layout_contents = &(read_to_string(kb_layout_fp)
+        .expect("Could not read keyboard layout config"));
 
     let kb_layout: Value = toml::from_str(&kb_layout_contents)
         .expect("Could not parse keyboard layout config");
@@ -78,19 +96,7 @@ fn main() -> Result<(), Error> {
     let kb_name = kb_config["name"].as_str().unwrap_or("us");
     let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
-    // Display keyboard config info
-    println!("Parsing keyboard config");
-    debug!("Keyboard Config\n");
-    debug!("{}", "=".repeat(16));
-    debug!("Keyboard Layout File: {}\n", kb_layout_fp);
-    debug!("Keyboard Name       : {}\n", kb_name);
-    debug!("Keyboard Descrption : {}\n", kb_desc);
-    debug!("{}", "=".repeat(16));
-
-    debug!("Keyboard Config Contents: ");
-    debug!("{}", "=".repeat(16));
-    debug!("{}\n", kb_layout_contents);
-    debug!("{}", "=".repeat(16));
+    show_kb_layout(kb_output_fp, kb_name, kb_desc, kb_layout_contents);
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(kb_name, kb_desc);
