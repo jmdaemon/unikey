@@ -1,7 +1,6 @@
 use log::{debug, error, info, warn};
 use clap::{Arg, Command};
 use toml::Value;
-use failure::Error;
 use std::fs::{read_to_string, write, create_dir_all};
 use std::collections::HashMap;
 use tera::{Tera, Context};
@@ -154,7 +153,7 @@ pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
     }
 }
 
-fn main() -> Result<(), Error> {
+fn main() {
     // Use logging
     pretty_env_logger::init();
 
@@ -246,6 +245,4 @@ fn main() -> Result<(), Error> {
         // Write the template to the output folder
         write(fp, contents).expect("Unable to write file");
     }
-    
-    Ok(())
 }
