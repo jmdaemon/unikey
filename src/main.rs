@@ -2,7 +2,7 @@ use log::{debug, error, info, warn};
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
-use std::fs::{read_to_string, File, write, create_dir_all};
+use std::fs::{read_to_string, write, create_dir_all};
 use std::io::Write;
 use std::collections::HashMap;
 use utility::files::{write_file};
@@ -204,8 +204,8 @@ fn main() -> Result<(), Error> {
     let tera = init_tera();
 
     // Populate templates with values from keyboard config
+
     // Populate the layout template
-    // Initialize the template context
     let mut layout_context = populate_context(&kb);
     populate_row_keys(&mut layout_context, &kb);
     populate_misc_keys(&mut layout_context, &kb);
@@ -242,13 +242,12 @@ fn main() -> Result<(), Error> {
 
     println!("Writing rendered templates to {}", kb_output_fp);
 
-    create_dir_all(kb_output_fp);
+    // Create directory if it doesn't exist
+    create_dir_all(kb_output_fp).expect(&format!("Directory {} could not be created", kb_output_fp));
     for (filename, contents) in rendered {
         let fp = format!("{}/{}", kb_output_fp, filename);
         // Write the template to the output folder
         write(fp, contents).expect("Unable to write file");
-        //let mut f = File::create(fp).expect("Unable to create file");
-        //f.write_all(contents.as_bytes()).expect("Unable to write data");
     }
     exit(0);
 
