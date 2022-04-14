@@ -135,6 +135,40 @@ pub fn render_template(tera: &Tera, template: &str, context: &mut Context) -> St
     rendered.to_string()
 }
 
+/// Format the rendered content to a string
+pub fn format_rendered(title: &str, rendered: &str) -> String {
+    let mut result = "".to_owned();
+    result.push_str(&format!("Rendered Template: \n"));
+    result.push_str(&format!("{}\n", title));
+    result.push_str(&format!("{}\n", "=".repeat(16)));
+    result.push_str(&format!("{}\n", rendered));
+    result.push_str(&format!("{}", "=".repeat(16)));
+    result
+}
+
+/// Displays the rendered template
+pub fn show_rendered(dryrun: bool, rendered: &str) {
+    let format_rendered = format_rendered("Linux Keyboard Layout", &rendered.to_string());
+    if dryrun {
+        //println!("Rendered Template: ");
+        //println!("Linux Keyboard Layout");
+        //println!("{}", "=".repeat(16));
+        //println!("{}\n", rendered);
+        //println!("{}", "=".repeat(16));
+        //println!();
+        println!("{}", format_rendered);
+        exit(0); // Exit early after printing the template
+    } else {
+        info!("{}", format_rendered);
+        //info!(format_rendered("Linux Keyboard Layout", rendered.to_string()));
+        //info!("Rendered Template: ");
+        //info!("Linux Keyboard Layout");
+        //info!("{}", "=".repeat(16));
+        //info!("{}\n", rendered);
+        //info!("{}", "=".repeat(16));
+    }
+}
+
 fn main() -> Result<(), Error> {
     // Use logging
     pretty_env_logger::init();
@@ -191,20 +225,8 @@ fn main() -> Result<(), Error> {
 
     //let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
     let rendered = render_template(&tera, "layout.tmpl", &mut context);
-    if dryrun {
-        println!("Rendered Template: ");
-        println!("Linux Keyboard Layout");
-        println!("{}", "=".repeat(16));
-        println!("{}\n", rendered);
-        println!("{}", "=".repeat(16));
-        exit(0); // Exit early after printing the template
-    } else {
-        info!("Rendered Template: ");
-        info!("Linux Keyboard Layout");
-        info!("{}", "=".repeat(16));
-        info!("{}\n", rendered);
-        info!("{}", "=".repeat(16));
-    }
+    show_rendered(dryrun, &rendered);
+
 
     // Populate the evdev layout
     let mut evdev_context = populate_context(&kb);
