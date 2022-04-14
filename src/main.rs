@@ -78,7 +78,7 @@ pub fn show_kb_layout(
 }
 
 #[derive(Default, Debug)]
-struct KeyboardLayout<'a, 'b> {
+pub struct KeyboardLayout<'a, 'b> {
     pub kb_name: &'b str,
     pub kb_desc: &'b str,
     pub kb_rows: HashMap<&'a str, Keys>,
@@ -93,6 +93,22 @@ impl KeyboardLayout <'static, 'static> {
             kb_misc: HashMap<&'a str, String>) -> KeyboardLayout<'a, 'b> {
         KeyboardLayout { kb_name, kb_desc, kb_rows, kb_misc }
     }
+}
+
+/// Populate the Tera Context with the row key values
+pub fn populate_row_keys(mut context: Context, kb: &KeyboardLayout) -> Context {
+    for (row, keys) in &kb.kb_rows {
+        info!("Row: {}", row);
+
+        let index = 1;
+        let keys = &keys.keys;
+        for keyval in keys {
+            info!("Key value: {}", keyval);
+            let key_index = format!("{}_key_{}", row, index);
+            context.insert(key_index, &keyval);
+        }
+    }
+    context
 }
 
 fn main() -> Result<(), Error> {
@@ -145,33 +161,7 @@ fn main() -> Result<(), Error> {
     // Initialize the template context
     let mut context = Context::new();
     context.insert("layout_name", &kb.kb_name);
-
-    // Populate the context with the row keys
-    for (row, keys) in &kb.kb_rows {
-        info!("Row: {}", row);
-
-        let index = 1;
-        //for keyval in keys.keys {
-        //for keyval in keys.keys.as_ref() {
-        let keys = &keys.keys;
-        for keyval in keys {
-            info!("Key value: {}", keyval);
-            //let key_name = str::replace(&keyval, "-", "_");
-            //let key_name = str::replace(index, "-", "_");
-            //let key_index = [row, key_name.as_str()].join("_");
-            let key_index = format!("{}_key_{}", row, index);
-            context.insert(key_index, &keyval);
-        }
-
-        //println!("\nRow: {}", row);
-        //for (key, value) in keys.unwrap() {
-
-        //for key_string in keys.keys {
-            //let key = str::replace(key, "-", "_");
-            //println!("Key: {}, Value: {}", key, value);
-            //context.insert([row, key.as_str()].join("_"), &value);
-        //}
-    }
+    populate_row_keys(context, &kb);
 
     // Initialize templates
     // Access fields in kb
