@@ -1,14 +1,13 @@
 // Unikey Modules
 use unikey::keyboard::{Keys, KeyboardLayout, show_kb_layout};
-use unikey::tmpl::{show_rendered, init_tera, render_template, populate_context, populate_row_keys, populate_misc_keys};
+use unikey::tmpl::{init_tera};
 use unikey::parse::{parse_rows, parse_misc};
 //use unikey::tmpl::linux::{populate_linux_kb_definition, populate_linux_kb};
-use unikey::linux::{populate_linux_kb_definition, populate_linux_kb};
+use unikey::linux::{populate_linux_kb};
 
 // Third Party Crates
 
-use log::{debug, info, error};
-use tera::Tera;
+use log::error;
 use clap::{Arg, Command};
 use toml::Value;
 

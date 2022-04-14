@@ -1,16 +1,18 @@
 // Unikey Modules
 //use crate::keyboard::{KeyboardLayout};
-use crate::keyboard::{Keys, KeyboardLayout, show_kb_layout};
-use crate::tmpl::{show_rendered, init_tera, render_template, populate_context, populate_row_keys, populate_misc_keys};
-use crate::parse::{parse_rows, parse_misc};
+//use crate::keyboard::{Keys, KeyboardLayout, show_kb_layout};
+use crate::keyboard::KeyboardLayout;
+use crate::tmpl::{show_rendered, render_template, populate_context, populate_row_keys, populate_misc_keys};
+//use crate::parse::{parse_rows, parse_misc};
 
 
 // Third Party Crates
-use log::{info, error};
-use tera::{Tera, Context};
+//use log::{error};
+//use tera::{Tera, Context};
+use tera::{Tera};
 
 // Standard Library
-use std::process::exit;
+//use std::process::exit;
 use std::collections::HashMap;
 
 /// Populate evdev.xml, base.lst, evdev.lst templates
