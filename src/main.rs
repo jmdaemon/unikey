@@ -1,20 +1,11 @@
-extern crate clap;
 use log::{debug, error, info, warn};
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
-//use utility::files::{read_to_string, write_file};
 use std::fs::read_to_string;
 use utility::files::{write_file};
 use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
-
-/// Pretty print a boxed title with a message inside
-pub fn display(title: &str, msg: String) {
-    println!("{}", title);
-    println!("{}", msg);
-    println!("{}\n", "=".repeat(title.len()));
-}
 
 pub fn build_cli() -> clap::Command<'static> {
     // Create Unikey CLI
@@ -99,19 +90,25 @@ fn main() -> Result<(), Error> {
     let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
     // Display keyboard config info
-    debug!("{}", "=".repeat(16));
+    println!("Parsing keyboard config");
     debug!("Keyboard Config\n");
+    debug!("{}", "=".repeat(16));
     debug!("Keyboard Layout File: {}\n", kb_layout_fp);
     debug!("Keyboard Name       : {}\n", kb_name);
     debug!("Keyboard Descrption : {}\n", kb_desc);
     debug!("{}", "=".repeat(16));
 
-    if verbose {
-        display("=== Contents ===", format!("{}", kb_layout_contents));
-        display("=== Keyboard Layout ===", format!("{:?}", &kb_layout));
-        display("=== Rows ===", format!("{:?}", &kb_layout["rows"]));
-        display("=== Row E ===", format!("{:?}", &kb_layout["rows"]["e"]));
-    }
+    debug!("Keyboard Config Contents: ");
+    debug!("{}", "=".repeat(16));
+    debug!("{}\n", kb_layout_contents);
+    debug!("{}", "=".repeat(16));
+
+    //if verbose {
+        //display("=== Contents ===", format!("{}", kb_layout_contents));
+        //display("=== Keyboard Layout ===", format!("{:?}", &kb_layout));
+        //display("=== Rows ===", format!("{:?}", &kb_layout["rows"]));
+        //display("=== Row E ===", format!("{:?}", &kb_layout["rows"]["e"]));
+    //}
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(kb_name, kb_desc);
