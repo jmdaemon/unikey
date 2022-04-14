@@ -1,5 +1,5 @@
 // Third Party Crates
-use log::{debug, info};
+use log::{debug, info, error};
 use clap::{Arg, Command};
 use tera::{Tera, Context};
 use toml::Value;
@@ -240,16 +240,22 @@ fn main() {
     // Initialize Tera
     let tera = init_tera();
 
-    // Populate templates with values from keyboard config
-    let rendered = populate_linux_kb(&kb, dryrun, &tera);
+    let mut rendered: HashMap<String, String> = HashMap::new();
+    match kb_type {
+        "linux" => {
+            // Populate templates with values from keyboard config
+            rendered = populate_linux_kb(&kb, dryrun, &tera);
+        }
+        _ => {
+            // The input can't be/should not be null here
+            error!("kb_type was not set to a default value");
+        }
+    }
 
     if dryrun {
         // Exit early after printing the template
         exit(0); 
     }
-
-
-
     println!("Writing rendered templates to {}", kb_output_fp);
 
     // Create directory if it doesn't exist
