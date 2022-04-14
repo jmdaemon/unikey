@@ -96,7 +96,7 @@ impl KeyboardLayout <'static, 'static> {
 }
 
 /// Populate the Tera Context with the row key values
-pub fn populate_row_keys(mut context: Context, kb: &KeyboardLayout) -> Context {
+pub fn populate_row_keys(mut context: &mut Context, kb: &KeyboardLayout) {
     for (row, keys) in &kb.kb_rows {
         info!("Row: {}", row);
 
@@ -108,7 +108,15 @@ pub fn populate_row_keys(mut context: Context, kb: &KeyboardLayout) -> Context {
             context.insert(key_index, &keyval);
         }
     }
-    context
+}
+
+pub fn populate_misc_keys(mut context: &mut Context, kb: &KeyboardLayout) {
+    let kb_misc = &kb.kb_misc;
+    for (key, val) in kb_misc.iter() {
+        info!("Key Name: {}", key);
+        info!("Key Value: {}", val);
+        context.insert(*key, val);
+    }
 }
 
 fn main() -> Result<(), Error> {
@@ -161,7 +169,8 @@ fn main() -> Result<(), Error> {
     // Initialize the template context
     let mut context = Context::new();
     context.insert("layout_name", &kb.kb_name);
-    populate_row_keys(context, &kb);
+    populate_row_keys(&mut context, &kb);
+    populate_misc_keys(&mut context, &kb);
 
     // Initialize templates
     // Access fields in kb
