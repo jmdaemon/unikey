@@ -1,11 +1,14 @@
-use log::{debug, error, info, warn};
+// Third Party Crates
+use log::{debug, info};
 use clap::{Arg, Command};
-use toml::Value;
-use std::fs::{read_to_string, write, create_dir_all};
-use std::collections::HashMap;
 use tera::{Tera, Context};
+use toml::Value;
 use utility::layout::{Keys, init_tera};
+
+// Standard Library
 use std::process::exit;
+use std::collections::HashMap;
+use std::fs::{read_to_string, write, create_dir_all};
 
 pub fn build_cli() -> clap::Command<'static> {
     // Create Unikey CLI
@@ -23,7 +26,12 @@ pub fn build_cli() -> clap::Command<'static> {
             .required(false)
             .short('d')
             .long("dryrun")
-            .help("Don't output files to disk"));
+            .help("Don't output files to disk"))
+        .arg(Arg::new("kb_type")
+            .default_value("linux")
+            .short('t')
+            .long("type")
+            .help("Type of keyboard layout. Types: [linux, apple, windows]."));
     app
 }
 
