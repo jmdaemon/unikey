@@ -1,9 +1,9 @@
+// Unikey Modules
+use crate::keyboard::{KeyboardLayout};
+
 // Third Party Crates
 use log::{info, error};
 use tera::{Tera, Context};
-//use libunikey::keyboard::KeyboardLayout;
-//use crate::keyboard::{Keys, KeyboardLayout};
-use crate::keyboard::{Keys, KeyboardLayout};
 
 // Standard Library
 use std::process::exit;
