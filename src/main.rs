@@ -3,6 +3,7 @@ use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
 use std::fs::read_to_string;
+use std::collections::HashMap;
 use utility::files::{write_file};
 use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
 use std::process::exit;
@@ -25,12 +26,17 @@ pub fn build_cli() -> clap::Command<'static> {
 const ROWS: [&str; 4] = ["e", "d", "c", "b"];
 
 /// Returns a vector of keys from a keyboard layout
-pub fn parse_rows(keyboard_layout: Value) -> Vec<Keys> {
+//pub fn parse_rows(keyboard_layout: &Value) -> Vec<Keys> {
+//pub fn parse_rows(keyboard_layout: &Value) -> HashMap<&str, Vec<Keys>> {
+pub fn parse_rows(keyboard_layout: &Value) -> HashMap<&str, Keys> {
     // Create a vector of keys
-    let mut row_keys: Vec<Keys> = vec![];
+    //let mut row_keys: Vec<Keys> = vec![];
+    //let mut row_keys: HashMap<&str, Vec<Keys>> = HashMap::new();
+    let mut row_keys: HashMap<&str, Keys> = HashMap::new();
 
     // For every row in the row of keys
     for row_name in ROWS {
+
         // Get the current row
         let row = &keyboard_layout["rows"][&row_name];
 
@@ -43,19 +49,20 @@ pub fn parse_rows(keyboard_layout: Value) -> Vec<Keys> {
             keys.push(key.to_string());
         }
         // Add the keys for that row to the vector
-        row_keys.push(Keys { keys: keys });
+        //row_keys.push(row_name, Keys { keys: keys });
+        row_keys.insert(row_name, Keys { keys: keys });
     }
     row_keys
 }
 
-pub fn parse_misc() {
+pub fn parse_misc(keyboard_layout: &Value) -> HashMap<&str, String> {
+    let row_misc: HashMap<&str, String> = HashMap::new();
+    row_misc
 }
 
 /// Display keyboard config debug info
 pub fn show_kb_layout(
     kb_layout_fp: &str, kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
-
-    println!("Parsing keyboard config");
     debug!("Keyboard Config\n");
     debug!("{}", "=".repeat(16));
     debug!("Keyboard Layout File: {}\n", kb_layout_fp);
@@ -67,6 +74,12 @@ pub fn show_kb_layout(
     debug!("{}", "=".repeat(16));
     debug!("{}\n", kb_layout_contents);
     debug!("{}", "=".repeat(16));
+}
+
+struct KeyboardLayout {
+    pub name: String,
+    pub desc: String,
+
 }
 
 fn main() -> Result<(), Error> {
@@ -86,6 +99,7 @@ fn main() -> Result<(), Error> {
     let kb_layout_contents = &(read_to_string(kb_layout_fp)
         .expect("Could not read keyboard layout config"));
 
+    println!("Parsing keyboard config");
     let kb_layout: Value = toml::from_str(&kb_layout_contents)
         .expect("Could not parse keyboard layout config");
 
@@ -97,6 +111,18 @@ fn main() -> Result<(), Error> {
     let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
     show_kb_layout(kb_output_fp, kb_name, kb_desc, kb_layout_contents);
+
+    // Parse keys in keyboard config
+    let kb_rows: HashMap<&str, Keys> = parse_rows(&kb_layout);
+    let kb_misc: HashMap<&str, String> = parse_misc(&kb_layout);
+
+    // Store output in KeyboardLayout
+
+    // Initialize templates
+    // Populate templates with values from keyboard config
+    // Store rendered templates in vector
+    // For every rendered template
+    // Write template to output folder
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(kb_name, kb_desc);
