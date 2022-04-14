@@ -12,6 +12,10 @@ tera = "1.15.0"
 log = "0.4.16"
 pretty_env_logger = "0.4.0"
 
+#[lib]
+#name = "libunikey"
+#path = "src/lib.rs"
+
 # Unit Tests
 [[bin]]
 name = "tests-utility"

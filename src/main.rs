@@ -1,7 +1,14 @@
+// Unikey Modules
+//use crate::keyboard::{Keys, KeyboardLayout, init_tera, show_kb_layout, ROWS};
+use unikey::keyboard::{Keys, KeyboardLayout, show_kb_layout, ROWS};
+//use crate::tmpl::{show_rendered, render_template, populate_context, populate_row_keys, populate_misc_keys};
+use unikey::tmpl::{show_rendered, init_tera, render_template, populate_context, populate_row_keys, populate_misc_keys};
+
 // Third Party Crates
+
 use log::{debug, info, error};
+use tera::Tera;
 use clap::{Arg, Command};
-use tera::{Tera, Context};
 use toml::Value;
 
 // Standard Library
@@ -34,18 +41,6 @@ pub fn build_cli() -> clap::Command<'static> {
     app
 }
 
-#[derive(Default, Debug)]
-pub struct Keys {
-    pub keys: Vec<String>
-}
-
-impl Keys {
-    pub fn new(row_keys: Vec<String>) -> Keys {
-        Keys { keys: row_keys }
-    }
-}
-
-const ROWS: [&str; 4] = ["e", "d", "c", "b"];
 
 /// Returns a HashMap of keys from a keyboard layout
 pub fn parse_rows(kb_layout: &Value) -> HashMap<&str, Keys> {
@@ -79,98 +74,6 @@ pub fn parse_misc(kb_layout: &Value) -> HashMap<&str, String> {
     row_misc
 }
 
-/// Display keyboard config debug info
-pub fn show_kb_layout(kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
-    debug!("Keyboard Config\n");
-    debug!("Keyboard Name       : {}\n", kb_name);
-    debug!("Keyboard Descrption : {}\n", kb_desc);
-    debug!("{}", "=".repeat(16));
-
-    debug!("Keyboard Config Contents: ");
-    debug!("{}", "=".repeat(16));
-    debug!("{}\n", kb_layout_contents);
-    debug!("{}", "=".repeat(16));
-}
-
-#[derive(Default, Debug)]
-pub struct KeyboardLayout<'a, 'b> {
-    pub kb_name: &'b str,
-    pub kb_desc: &'b str,
-    pub kb_rows: HashMap<&'a str, Keys>,
-    pub kb_misc: HashMap<&'a str, String>
-}
-
-impl KeyboardLayout <'static, 'static> {
-    pub fn new<'a, 'b> (
-            kb_name: &'b str,
-            kb_desc: &'b str,
-            kb_rows: HashMap<&'a str, Keys>,
-            kb_misc: HashMap<&'a str, String>) -> KeyboardLayout<'a, 'b> {
-        KeyboardLayout { kb_name, kb_desc, kb_rows, kb_misc }
-    }
-}
-
-/// Populate the Tera Context with the row key values
-pub fn populate_row_keys(context: &mut Context, kb: &KeyboardLayout) {
-    for (row, keys) in &kb.kb_rows {
-        info!("Row: {}", row);
-
-        let mut index = 1;
-        let keys = &keys.keys;
-        for keyval in keys {
-            info!("Key value: {}", keyval);
-            let key_index = format!("{}_key_{}", row, index);
-            context.insert(key_index, &keyval);
-            index += 1;
-        }
-    }
-}
-
-/// Populate the Tera Context with the misc key values
-pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
-    let kb_misc = &kb.kb_misc;
-    for (key, val) in kb_misc.iter() {
-        let key_index = format!("misc_{}", key);
-        info!("Key Name: {}", key_index);
-        info!("Key Value: {}", val);
-        context.insert(key_index, val);
-    }
-}
-
-/// Populate the Tera Context with the keyboard name and description values
-pub fn populate_context(kb: &KeyboardLayout) -> Context {
-    let mut context = Context::new();
-    context.insert("layout_name", &kb.kb_name);
-    context.insert("layout_desc", &kb.kb_desc);
-    context
-}
-
-/// Renders the template with the Tera Context to a string
-pub fn render_template(tera: &Tera, template: &str, context: &mut Context) -> String {
-    let rendered = tera.render(template, &context).expect("Template failed to render");
-    rendered.to_string()
-}
-
-/// Format the rendered content to a string
-pub fn format_rendered(title: &str, rendered: &str) -> String {
-    let mut result = "".to_owned();
-    result.push_str(&format!("{}\n", title));
-    result.push_str(&format!("{}\n", "=".repeat(16)));
-    result.push_str(&format!("{}\n", rendered));
-    result.push_str(&format!("{}", "=".repeat(16)));
-    result
-}
-
-/// Displays the rendered template
-pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
-    let format_rendered = format_rendered(title, &rendered.to_string());
-    if dryrun {
-        println!("{}", format_rendered);
-    } else {
-        info!("{}", format_rendered);
-    }
-}
-
 /// Populate evdev.xml, base.lst, evdev.lst templates
 pub fn populate_linux_kb_definition(kb: &KeyboardLayout, dryrun: bool, tera: &Tera, template: &str) -> String {
     let mut context = populate_context(&kb);
@@ -202,18 +105,6 @@ pub fn populate_linux_kb(kb: &KeyboardLayout, dryrun: bool, tera: &Tera) -> Hash
     rendered.insert("evdev.lst".to_string(), rendered_evdev_lst);
     rendered
 }
-
-pub fn init_tera(kb_type: &str) -> Tera {
-    let tera = match Tera::new(&format!("templates/{}/**/*.tmpl", kb_type)) {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("Parsing error(s): {}", e);
-            exit(1);
-        }
-    };
-    return tera;
-}
-
 
 fn main() {
     // Use logging
