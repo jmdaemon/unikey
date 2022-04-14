@@ -2,7 +2,8 @@ use log::{debug, error, info, warn};
 use clap::{Arg, Command};
 use toml::Value;
 use failure::Error;
-use std::fs::read_to_string;
+use std::fs::{read_to_string, File, write, create_dir_all};
+use std::io::Write;
 use std::collections::HashMap;
 use utility::files::{write_file};
 use tera::{Tera, Context};
@@ -232,9 +233,24 @@ fn main() -> Result<(), Error> {
         exit(0); 
     }
 
-    // Store rendered templates in vector
-    // For every rendered template
-    // Write template to output folder
+    // Create a hashmap containing the output file name, and its rendered contents
+    let mut rendered: HashMap<&str, &str> = HashMap::new();
+    rendered.insert(&kb.kb_name, &rendered_layout);
+    rendered.insert("evdev.xml", &rendered_evdev);
+    rendered.insert("base.lst", &rendered_base_lst);
+    rendered.insert("evdev.lst", &rendered_evdev_lst);
+
+    println!("Writing rendered templates to {}", kb_output_fp);
+
+    create_dir_all(kb_output_fp);
+    for (filename, contents) in rendered {
+        let fp = format!("{}/{}", kb_output_fp, filename);
+        // Write the template to the output folder
+        write(fp, contents).expect("Unable to write file");
+        //let mut f = File::create(fp).expect("Unable to create file");
+        //f.write_all(contents.as_bytes()).expect("Unable to write data");
+    }
+    exit(0);
 
     // Initializes Tera templates
     let layout: Layout = Layout::new(kb_name, kb_desc);
@@ -253,7 +269,6 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    exit(0);
     let rendered_layout = create_layout(&kb_layout, &layout, false);
 
     // Render our variables into the templates
