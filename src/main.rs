@@ -3,8 +3,6 @@ use log::{debug, info, error};
 use clap::{Arg, Command};
 use tera::{Tera, Context};
 use toml::Value;
-//use utility::layout::{Keys, init_tera};
-use utility::layout::{Keys};
 
 // Standard Library
 use std::process::exit;
@@ -34,6 +32,17 @@ pub fn build_cli() -> clap::Command<'static> {
             .long("type")
             .help("Type of keyboard layout. Types: [linux, apple, windows]."));
     app
+}
+
+#[derive(Default, Debug)]
+pub struct Keys {
+    pub keys: Vec<String>
+}
+
+impl Keys {
+    pub fn new(row_keys: Vec<String>) -> Keys {
+        Keys { keys: row_keys }
+    }
 }
 
 const ROWS: [&str; 4] = ["e", "d", "c", "b"];
@@ -170,7 +179,7 @@ pub fn populate_linux_kb_definition(kb: &KeyboardLayout, dryrun: bool, tera: &Te
     rendered_template.to_string()
 }
 
-//pub fn populate_linux_kb<'a> (kb: &'a KeyboardLayout, dryrun: bool, tera: &Tera) -> HashMap<String, &'static str> {
+/// Output a hashmap containing the files for a custom linux keyboard mapping
 pub fn populate_linux_kb(kb: &KeyboardLayout, dryrun: bool, tera: &Tera) -> HashMap<String, String> {
     // Populate the layout template
     let mut layout_context = populate_context(&kb);
