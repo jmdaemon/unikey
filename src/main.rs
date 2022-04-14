@@ -161,6 +161,13 @@ pub fn show_rendered(dryrun: bool, title: &str, rendered: &str) {
     }
 }
 
+pub fn populate_linux_kb_definition(kb: &KeyboardLayout, dryrun: bool, tera: &Tera, template: &str) -> String {
+    let mut context = populate_context(&kb);
+    let rendered_template = render_template(&tera, template, &mut context);
+    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_template);
+    rendered_template.to_string()
+}
+
 fn main() {
     // Use logging
     pretty_env_logger::init();
@@ -218,20 +225,10 @@ fn main() {
     let rendered_layout = render_template(&tera, "layout.tmpl", &mut layout_context);
     show_rendered(dryrun, "Linux Keyboard Layout", &rendered_layout);
 
-    // Populate the evdev template
-    let mut evdev_context = populate_context(&kb);
-    let rendered_evdev = render_template(&tera, "evdev.xml.tmpl", &mut evdev_context);
-    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_evdev);
-
-    // Populate the base.lst template
-    let mut base_lst_context = populate_context(&kb);
-    let rendered_base_lst = render_template(&tera, "base.lst.tmpl", &mut base_lst_context);
-    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_base_lst);
-
-    // Populate the evdev.lst template
-    let mut evdev_lst_context = populate_context(&kb);
-    let rendered_evdev_lst = render_template(&tera, "evdev.lst.tmpl", &mut evdev_lst_context);
-    show_rendered(dryrun, "Linux Keyboard Definition", &rendered_evdev_lst);
+    // Populate evdev.xml, base.lst, evdev.lst templates
+    let rendered_evdev = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.xml.tmpl");
+    let rendered_base_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "base.lst.tmpl");
+    let rendered_evdev_lst = populate_linux_kb_definition(&kb, dryrun, &tera, "evdev.lst.tmpl");
 
     if dryrun {
         // Exit early after printing the template
