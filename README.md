@@ -1,6 +1,6 @@
 # Unikey
 
-A custom keyboard creation tool for Linux and MacOSX systems.
+A custom keyboard layout creation tool for Linux and MacOSX systems.
 
 Unikey is a tool to help you create and install custom keyboard layouts on Linux.
 
@@ -17,24 +17,45 @@ one of the available releases.
 
 ## Usage
 
-To create your keyboard layout you can run:
+### Creating your keyboard layout
+
+1. Create a keyboard layout:
+``` toml
+[config]
+name = "us"
+desc = "English (US)"
+
+[rows]
+    e = [ '1', '2', '3', '4', '5', '6', '7', '8'    , '9'       , '0'           , 'minus'       , 'equal' ]
+    d = [ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i'    , 'o'       , 'p'           , 'bracketleft' , 'bracketright' ]
+    c = [ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k'    , 'l'       , 'semicolon'   , 'apostrophe' ]
+    b = [ 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'comma', 'period'  , 'slash' ]
+
+    [rows.misc]
+    BKSL = "backslash"
+    TLDE = "grave"
+```
+
+2. Compile your keyboard layout for the target operating system:
 
 ``` bash
 unikey keyboard.layout.toml layout -t linux
 ```
 
-to generate a linux xkb compatible keyboard mapping for you to use.
-You can also do a dryrun by passing in the `-d` flag when running unikey.
-
-### Installing your custom keyboard mappings
-
-To install your custom keyboard map, use the `install.sh` file in the repository:
+3. Install using the `install.sh` script in the project:
 
 ```
 ./install.sh layout layout_name
 ```
 
-you will be prompted to enter the root password to install the keyboard map.
+You can also do a dryrun by passing in the `-d` flag when running unikey.
+
+For more information about creating your keyboard layout,
+see `key.layout.toml` for an example of a keyboard layout.
+
+Note that for linux keyboard maps, your key values are not checked for validity at creation time,
+so if you install the keyboard map containing an invalid or unrecognized key value, you will be
+unable to load your custom keyboard layout.
 
 ## Contributions
 
