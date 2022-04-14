@@ -64,8 +64,7 @@ pub fn parse_misc(kb_layout: &Value) -> HashMap<&str, String> {
 }
 
 /// Display keyboard config debug info
-pub fn show_kb_layout(
-    kb_layout_fp: &str, kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
+pub fn show_kb_layout(kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
     debug!("Keyboard Config\n");
     debug!("Keyboard Name       : {}\n", kb_name);
     debug!("Keyboard Descrption : {}\n", kb_desc);
@@ -152,7 +151,7 @@ fn main() -> Result<(), Error> {
     let kb_name = kb_config["name"].as_str().unwrap_or("us");
     let kb_desc = kb_config["desc"].as_str().unwrap_or("English (US)");
 
-    show_kb_layout(kb_output_fp, kb_name, kb_desc, kb_layout_contents);
+    show_kb_layout(kb_name, kb_desc, kb_layout_contents);
 
     // Parse keys in keyboard config
     // Note that misc keys are handled separately from the normal keys
