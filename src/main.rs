@@ -19,7 +19,12 @@ pub fn build_cli() -> clap::Command<'static> {
             .help("File path to the keyboard layout toml file"))
         .arg(Arg::new("output")
             .default_value("./layouts")
-            .help("Output directory"));
+            .help("Output directory"))
+        .arg(Arg::new("dryrun")
+            .required(false)
+            .short('d')
+            .long("dryrun")
+            .help("Don't output files to disk"));
     app
 }
 
@@ -61,8 +66,6 @@ pub fn parse_misc(kb_layout: &Value) -> HashMap<&str, String> {
 pub fn show_kb_layout(
     kb_layout_fp: &str, kb_name: &str, kb_desc: &str, kb_layout_contents: &str) {
     debug!("Keyboard Config\n");
-    debug!("{}", "=".repeat(16));
-    debug!("Keyboard Layout File: {}\n", kb_layout_fp);
     debug!("Keyboard Name       : {}\n", kb_name);
     debug!("Keyboard Descrption : {}\n", kb_desc);
     debug!("{}", "=".repeat(16));
@@ -100,6 +103,11 @@ fn main() -> Result<(), Error> {
     let matches = app.get_matches();
 
     // Parse arguments
+    let dryrun = matches.is_present("dryrun");
+    if dryrun {
+        println!("Showing dryrun of output keyboard layout");
+    }
+
     let kb_output_fp = matches.value_of("output").unwrap();
     let kb_layout_fp = matches
         .value_of("kb_layout_fp")
