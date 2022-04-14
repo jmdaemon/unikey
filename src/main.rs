@@ -5,7 +5,8 @@ use failure::Error;
 use std::fs::read_to_string;
 use std::collections::HashMap;
 use utility::files::{write_file};
-use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst};
+use tera::{Tera, Context};
+use utility::layout::{Keys, KeyMap, Layout, create_layout, create_evdev, create_lst, init_tera};
 use std::process::exit;
 
 pub fn build_cli() -> clap::Command<'static> {
@@ -137,14 +138,50 @@ fn main() -> Result<(), Error> {
     // Store output in KeyboardLayout
     let kb = KeyboardLayout::new(kb_name, kb_desc, kb_rows, kb_misc);
 
+
+    // Initialize Tera
+    let tera = init_tera();
+
+    // Initialize the template context
+    let mut context = Context::new();
+    context.insert("layout_name", &kb.kb_name);
+
+    // Populate the context with the row keys
+    for (row, keys) in &kb.kb_rows {
+        info!("Row: {}", row);
+
+        let index = 1;
+        //for keyval in keys.keys {
+        //for keyval in keys.keys.as_ref() {
+        let keys = &keys.keys;
+        for keyval in keys {
+            info!("Key value: {}", keyval);
+            //let key_name = str::replace(&keyval, "-", "_");
+            //let key_name = str::replace(index, "-", "_");
+            //let key_index = [row, key_name.as_str()].join("_");
+            let key_index = format!("{}_key_{}", row, index);
+            context.insert(key_index, &keyval);
+        }
+
+        //println!("\nRow: {}", row);
+        //for (key, value) in keys.unwrap() {
+
+        //for key_string in keys.keys {
+            //let key = str::replace(key, "-", "_");
+            //println!("Key: {}, Value: {}", key, value);
+            //context.insert([row, key.as_str()].join("_"), &value);
+        //}
+    }
+
+    // Initialize templates
     // Access fields in kb
     println!("{}\n", kb.kb_name);
     println!("{}\n", kb.kb_desc);
     println!("{:?}\n", kb.kb_rows);
     println!("{:?}\n", kb.kb_misc);
 
+    
 
-    // Initialize templates
     // Populate templates with values from keyboard config
     // Store rendered templates in vector
     // For every rendered template

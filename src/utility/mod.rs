@@ -74,7 +74,7 @@ pub mod layout {
     }
 
     /// Creates a Tera instance with all the templates found in templates
-    fn init_tera() -> Tera {
+    pub fn init_tera() -> Tera {
         let tera = match Tera::new("templates/**/*.tmpl") {
             Ok(t) => t,
             Err(e) => {
