@@ -120,6 +120,13 @@ pub fn populate_misc_keys(context: &mut Context, kb: &KeyboardLayout) {
     }
 }
 
+pub fn init_context(kb: &KeyboardLayout) -> Context {
+    let mut context = Context::new();
+    context.insert("layout_name", &kb.kb_name);
+    context.insert("layout_desc", &kb.kb_desc);
+    context
+}
+
 fn main() -> Result<(), Error> {
     // Use logging
     pretty_env_logger::init();
@@ -168,20 +175,11 @@ fn main() -> Result<(), Error> {
     let tera = init_tera();
 
     // Initialize the template context
-    let mut context = Context::new();
-    context.insert("layout_name", &kb.kb_name);
-    context.insert("layout_desc", &kb.kb_desc);
+    let mut context = init_context(&kb);
     populate_row_keys(&mut context, &kb);
     populate_misc_keys(&mut context, &kb);
 
     // Initialize templates
-    // Access fields in kb
-    //println!("{}\n", kb.kb_name);
-    //println!("{}\n", kb.kb_desc);
-    //println!("{:?}\n", kb.kb_rows);
-    //println!("{:?}\n", kb.kb_misc);
-
-
     let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
     if dryrun {
         println!("Rendered Template: ");
@@ -198,7 +196,6 @@ fn main() -> Result<(), Error> {
         info!("{}", "=".repeat(16));
     }
     
-
     // Populate templates with values from keyboard config
     // Store rendered templates in vector
     // For every rendered template
