@@ -13,11 +13,6 @@ pub fn build_cli() -> clap::Command<'static> {
         .version("0.1.1")
         .author("Joseph Diza <josephm.diza@gmail.com>")
         .about("Create linux xkb keyboard layouts")
-        .arg(Arg::new("v")
-            .short('v')
-            .long("verbose")
-            .required(false)
-            .help("Show verbose output"))
         .arg(Arg::new("keyboard_layout")
             .help("Specify the file path to the keyboard layout config"));
     app
@@ -55,21 +50,10 @@ pub fn parse_misc() {
 fn main() -> Result<(), Error> {
     // Use logging
     pretty_env_logger::init();
-    let app = build_cli();
 
-    // Print help message if user inputs -vv
-    let mut borrow_app = app.clone();
+    // Create command line interface
+    let app = build_cli();
     let matches = app.get_matches();
-    let verbose;
-    match matches.occurrences_of("v") {
-        0 => verbose = false,
-        1 => verbose = true,
-        _ => {
-            borrow_app.print_help()?;
-            println!("");
-            std::process::exit(1);
-        }
-    }
 
     // Parse arguments
     let kb_layout_fp = matches
@@ -103,13 +87,6 @@ fn main() -> Result<(), Error> {
     debug!("{}\n", kb_layout_contents);
     debug!("{}", "=".repeat(16));
 
-    //if verbose {
-        //display("=== Contents ===", format!("{}", kb_layout_contents));
-        //display("=== Keyboard Layout ===", format!("{:?}", &kb_layout));
-        //display("=== Rows ===", format!("{:?}", &kb_layout["rows"]));
-        //display("=== Row E ===", format!("{:?}", &kb_layout["rows"]["e"]));
-    //}
-
     // Initializes Tera templates
     let layout: Layout = Layout::new(kb_name, kb_desc);
     let ekeys = &kb_layout["rows"]["e"].as_array();
@@ -128,7 +105,7 @@ fn main() -> Result<(), Error> {
     }
 
     exit(0);
-    let rendered_layout = create_layout(&kb_layout, &layout, verbose);
+    let rendered_layout = create_layout(&kb_layout, &layout, false);
 
     // Render our variables into the templates
     let evdev = create_evdev(&layout);
