@@ -169,16 +169,33 @@ fn main() -> Result<(), Error> {
     // Initialize the template context
     let mut context = Context::new();
     context.insert("layout_name", &kb.kb_name);
+    context.insert("layout_desc", &kb.kb_desc);
     populate_row_keys(&mut context, &kb);
     populate_misc_keys(&mut context, &kb);
 
     // Initialize templates
     // Access fields in kb
-    println!("{}\n", kb.kb_name);
-    println!("{}\n", kb.kb_desc);
-    println!("{:?}\n", kb.kb_rows);
-    println!("{:?}\n", kb.kb_misc);
+    //println!("{}\n", kb.kb_name);
+    //println!("{}\n", kb.kb_desc);
+    //println!("{:?}\n", kb.kb_rows);
+    //println!("{:?}\n", kb.kb_misc);
 
+
+    let rendered = tera.render("layout.tmpl", &context).expect("Template failed to render");
+    if dryrun {
+        println!("Rendered Template: ");
+        println!("Linux Keyboard Layout");
+        println!("{}", "=".repeat(16));
+        println!("{}\n", rendered);
+        println!("{}", "=".repeat(16));
+        exit(0); // Exit early after printing the template
+    } else {
+        info!("Rendered Template: ");
+        info!("Linux Keyboard Layout");
+        info!("{}", "=".repeat(16));
+        info!("{}\n", rendered);
+        info!("{}", "=".repeat(16));
+    }
     
 
     // Populate templates with values from keyboard config
