@@ -1,17 +1,44 @@
 #!/usr/bin/python3.9
 
 # import sys
-import click
+# import click
 # import html
 from bs4 import BeautifulSoup, Comment
 from pprint import pprint
 import re
+import argparse
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-@click.command(options_metavar='[options]', context_settings=CONTEXT_SETTINGS)
-@click.option('-V'   , '--version'      , 'version'     , help='Show program version'           , is_flag=True, default=False)
-@click.option('-v'   , '--verbose'      , 'verbose'     , help='Display verbose output'         , is_flag=True, default=False)
-@click.argument('fname', metavar='<filename>', required=True)
+# Functions
+
+def read_file(fname):
+    file = open(fname)
+    res  = file.read()
+    file.close()
+    return res
+
+def strip_comments(soup):
+    '''  Strip all xml comments '''
+    for elem in soup(text=lambda text: isinstance(text, Comment)):
+        elem.extract()
+    return soup
+
+parser = argparse.ArgumentParser(description='Parse an apple keyboard layout into a unikey layout')
+parser.add_argument('kb_layout_fp')
+args = parser.parse_args()
+kb_layout_fp  = args.kb_layout_fp
+
+# CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+# @click.command(options_metavar='[options]', context_settings=CONTEXT_SETTINGS)
+# @click.option('-V'   , '--version'      , 'version'     , help='Show program version'           , is_flag=True, default=False)
+# @click.option('-v'   , '--verbose'      , 'verbose'     , help='Display verbose output'         , is_flag=True, default=False)
+# @click.argument('fname', metavar='<filename>', required=True)
+
+# Keyboard layout is an xml file
+kb_layout_contents = read_file(kb_layout_fp)
+kb_layout_xml = BeautifulSoup(kb_layout_contents, features='lxml')
+
+kb_layout_xml = strip_comments(kb_layout_xml)
+
 def cli(version, verbose, fname):
     contents = read_file(fname)
     soup = BeautifulSoup(contents, features='lxml')
@@ -255,12 +282,8 @@ def extract_apple_keys(soup):
         i += 1
     return inter
 
-def read_file(fname):
-    file = open(fname)
-    res  = file.read()
-    file.close()
-    return res
 
 
-if __name__ == '__main__':
-    cli()
+
+# if __name__ == '__main__':
+    # cli()
