@@ -1,15 +1,15 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python
 
-# import sys
-# import click
-# import html
 from bs4 import BeautifulSoup, Comment
 from pprint import pprint
 import re
 import argparse
+import logging
+
+# Show debug output
+logging.basicConfig(level=logging.DEBUG)
 
 # Functions
-
 def read_file(fname):
     file = open(fname)
     res  = file.read()
@@ -22,22 +22,80 @@ def strip_comments(soup):
         elem.extract()
     return soup
 
-parser = argparse.ArgumentParser(description='Parse an apple keyboard layout into a unikey layout')
-parser.add_argument('kb_layout_fp')
-args = parser.parse_args()
-kb_layout_fp  = args.kb_layout_fp
+def extract_apple_keys(soup):
+    # A single apple keyboard layout file can contain multiple keyboard layouts
+    keymap_index = soup.find_all(attrs={'index': re.compile(r"\d+")})
 
-# CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-# @click.command(options_metavar='[options]', context_settings=CONTEXT_SETTINGS)
-# @click.option('-V'   , '--version'      , 'version'     , help='Show program version'           , is_flag=True, default=False)
-# @click.option('-v'   , '--verbose'      , 'verbose'     , help='Display verbose output'         , is_flag=True, default=False)
-# @click.argument('fname', metavar='<filename>', required=True)
+    # Store all the additional keyboard layouts
+    index = 0
+    keymaps = {}
+    while (index < len(keymap_index)):
+        keymaps[index] = keymap_index[index]
+        index += 1
+
+    inter = [ {
+        'index': 0,
+        'keys': [ {
+            'code': '',
+            'output': '',
+        }, ]
+    }, ]
+
+    i = 0
+    # For every keyboard layout
+    for index, keymap in keymaps.items():
+        # Parse the xml content of the layout
+        soup_map = BeautifulSoup(str(keymap), features='lxml')
+
+        # Set the current index of the keyboard layout
+        index_data = {
+            'index': index,
+            'keys': [
+            ]
+        }
+        # Insert the layout into our intermediate structure
+        inter.insert(index, index_data)
+        # For every element in the keyboard layout starting from the end
+        for elm in reversed(soup_map()):
+            # Get the element's attributes
+            att = elm.attrs
+            # If the element contains a code and an output
+            if 'code' in att and 'output' in att:
+                # Get the code and the output corresponding to a key
+                code = att['code']
+                output = att['output']
+                # Save that in a dictionary
+                key_data = {
+                    'code': code,
+                    'output': output,
+                }
+                # Create a new keys entry
+                key_list = inter[index]['keys']
+                # Save the key data for later
+                key_list.insert(i, key_data)
+                # print(f'\n\nindex: {index}')
+                # print(inter)
+        i += 1
+    return inter
+
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Parse an apple keyboard layout into a unikey layout')
+parser.add_argument('keyboard_layout_fp')
+args = parser.parse_args()
+kb_layout_fp  = args.keyboard_layout_fp
 
 # Keyboard layout is an xml file
 kb_layout_contents = read_file(kb_layout_fp)
 kb_layout_xml = BeautifulSoup(kb_layout_contents, features='lxml')
-
 kb_layout_xml = strip_comments(kb_layout_xml)
+
+# Display entire keyboard layout file
+logging.debug(kb_layout_xml.prettify())
+
+# Display all keyboard maps
+inter = extract_apple_keys(kb_layout_xml)
+
 
 def cli(version, verbose, fname):
     contents = read_file(fname)
@@ -211,6 +269,7 @@ def cli(version, verbose, fname):
                 for row, keys in rows.items():
                     for linux_key in keys:
                         if apple_key['code'] == ';':
+                            pass
 
                 # row_index += 1
             # for linux_key in keys:
@@ -242,48 +301,3 @@ def cli(version, verbose, fname):
 
     # layout = { { {}, }, }
 
-def extract_apple_keys(soup):
-    keymap_index = soup.find_all(attrs={'index': re.compile(r"\d+")})
-    index = 0
-    keymaps = {}
-    while (index < len(keymap_index)):
-        keymaps[index] = keymap_index[index]
-        index += 1
-
-    inter = [ {
-        'index': 0,
-        'keys': [ {
-            'code': '',
-            'output': '',
-        }, ]
-    }, ]
-    i = 0
-    for index, keymap in keymaps.items():
-        soup_map = BeautifulSoup(str(keymap), features='lxml')
-        index_data = {
-            'index': index,
-            'keys': [
-            ]
-        }
-        inter.insert(index, index_data)
-        for elm in reversed(soup_map()):
-            att = elm.attrs
-            if 'code' in att and 'output' in att:
-                code = att['code']
-                output = att['output']
-                key_data = {
-                    'code': code,
-                    'output': output,
-                }
-                key_list = inter[index]['keys']
-                key_list.insert(i, key_data)
-                # print(f'\n\nindex: {index}')
-                # print(inter)
-        i += 1
-    return inter
-
-
-
-
-# if __name__ == '__main__':
-    # cli()
