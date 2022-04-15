@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+# Imports
 from bs4 import BeautifulSoup, Comment
 from pprint import pprint
 import re
@@ -22,16 +23,21 @@ def strip_comments(soup):
         elem.extract()
     return soup
 
-def extract_apple_keys(soup):
+def extract_xml_keymaps(soup):
+    ''' Extract all the keymaps available in the keyboard layout file '''
     # A single apple keyboard layout file can contain multiple keyboard layouts
-    keymap_index = soup.find_all(attrs={'index': re.compile(r"\d+")})
+    keymaps_xml_soup = soup.find_all(attrs={'index': re.compile(r"\d+")})
 
     # Store all the additional keyboard layouts
     index = 0
-    keymaps = {}
-    while (index < len(keymap_index)):
-        keymaps[index] = keymap_index[index]
+    keymaps_xml = {}
+    while (index < len(keymaps_xml_soup)):
+        keymaps_xml[index] = keymaps_xml_soup[index]
         index += 1
+    return keymaps_xml
+
+def extract_apple_keys(soup):
+    keymaps_xml = extract_xml_keymaps(soup)
 
     inter = [ {
         'index': 0,
@@ -43,7 +49,7 @@ def extract_apple_keys(soup):
 
     i = 0
     # For every keyboard layout
-    for index, keymap in keymaps.items():
+    for index, keymap in keymaps_xml.items():
         # Parse the xml content of the layout
         soup_map = BeautifulSoup(str(keymap), features='lxml')
 
